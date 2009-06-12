@@ -174,6 +174,7 @@ struct pptp_opt {
 };
 
 struct pppolac_opt {
+<<<<<<< HEAD
 	__u32		local;
 	__u32		remote;
 	__u32		recv_sequence;
