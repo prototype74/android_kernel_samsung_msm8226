@@ -2,7 +2,10 @@
  * include/linux/ion.h
  *
  * Copyright (C) 2011 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+=======
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -18,12 +21,18 @@
 #ifndef _LINUX_ION_H
 #define _LINUX_ION_H
 
+<<<<<<< HEAD
 #include <linux/ioctl.h>
 #include <linux/types.h>
 
 struct ion_handle;
 typedef struct ion_handle *ion_user_handle_t;
 
+=======
+#include <linux/types.h>
+
+struct ion_handle;
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 /**
  * enum ion_heap_types - list of all possible types of heaps
  * @ION_HEAP_TYPE_SYSTEM:	 memory allocated via vmalloc
@@ -31,22 +40,33 @@ typedef struct ion_handle *ion_user_handle_t;
  * @ION_HEAP_TYPE_CARVEOUT:	 memory allocated from a prereserved
  * 				 carveout heap, allocations are physically
  * 				 contiguous
+<<<<<<< HEAD
  * @ION_HEAP_END:		helper for iterating over heaps
+=======
+ * @ION_HEAP_END:		 helper for iterating over heaps
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  */
 enum ion_heap_type {
 	ION_HEAP_TYPE_SYSTEM,
 	ION_HEAP_TYPE_SYSTEM_CONTIG,
 	ION_HEAP_TYPE_CARVEOUT,
+<<<<<<< HEAD
 	ION_HEAP_TYPE_CHUNK,
 	ION_HEAP_TYPE_CUSTOM, /* must be last so device specific heaps always
 				 are at the end of this enum */
 	ION_NUM_HEAPS = 16,
+=======
+	ION_HEAP_TYPE_CUSTOM, /* must be last so device specific heaps always
+				 are at the end of this enum */
+	ION_NUM_HEAPS,
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 };
 
 #define ION_HEAP_SYSTEM_MASK		(1 << ION_HEAP_TYPE_SYSTEM)
 #define ION_HEAP_SYSTEM_CONTIG_MASK	(1 << ION_HEAP_TYPE_SYSTEM_CONTIG)
 #define ION_HEAP_CARVEOUT_MASK		(1 << ION_HEAP_TYPE_CARVEOUT)
 
+<<<<<<< HEAD
 #define ION_NUM_HEAP_IDS		sizeof(unsigned int) * 8
 
 /**
@@ -72,6 +92,9 @@ enum ion_heap_type {
 #ifdef __KERNEL__
 #include <linux/err.h>
 #include <mach/ion.h>
+=======
+#ifdef __KERNEL__
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 struct ion_device;
 struct ion_heap;
 struct ion_mapper;
@@ -87,6 +110,7 @@ struct ion_buffer;
 /**
  * struct ion_platform_heap - defines a heap in the given platform
  * @type:	type of the heap from ion_heap_type enum
+<<<<<<< HEAD
  * @id:		unique identifier for heap.  When allocating higher numbers
  * 		will be allocated from first.  At allocation these are passed
  *		as a bit mask and therefore can not exceed ION_NUM_HEAP_IDS.
@@ -99,6 +123,13 @@ struct ion_buffer;
  * @priv:	heap private data
  * @align:	required alignment in physical memory if applicable
  * @priv:	private info passed from the board file
+=======
+ * @id:		unique identifier for heap.  When allocating (lower numbers 
+ * 		will be allocated from first)
+ * @name:	used for debug purposes
+ * @base:	base address of heap in physical memory if applicable
+ * @size:	size of the heap in bytes if applicable
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  *
  * Provided by the board file.
  */
@@ -108,22 +139,31 @@ struct ion_platform_heap {
 	const char *name;
 	ion_phys_addr_t base;
 	size_t size;
+<<<<<<< HEAD
 	enum ion_memory_types memory_type;
 	unsigned int has_outer_cache;
 	void *extra_data;
 	ion_phys_addr_t align;
 	void *priv;
+=======
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 };
 
 /**
  * struct ion_platform_data - array of platform heaps passed from board file
+<<<<<<< HEAD
  * @has_outer_cache:    set to 1 if outer cache is used, 0 otherwise.
  * @nr:    number of structures in the array
  * @heaps: array of platform_heap structions
+=======
+ * @nr:		number of structures in the array
+ * @heaps:	array of platform_heap structions
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  *
  * Provided by the board file in the form of platform data to a platform device.
  */
 struct ion_platform_data {
+<<<<<<< HEAD
 	unsigned int has_outer_cache;
 	int nr;
 	struct ion_platform_heap *heaps;
@@ -150,6 +190,20 @@ void ion_reserve(struct ion_platform_data *data);
  */
 struct ion_client *ion_client_create(struct ion_device *dev,
 				     const char *name);
+=======
+	int nr;
+	struct ion_platform_heap heaps[];
+};
+
+/**
+ * ion_client_create() -  allocate a client and returns it
+ * @dev:	the global ion device
+ * @heap_mask:	mask of heaps this client can allocate from
+ * @name:	used for debugging
+ */
+struct ion_client *ion_client_create(struct ion_device *dev,
+				     unsigned int heap_mask, const char *name);
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 
 /**
  * ion_client_destroy() -  free's a client and all it's handles
@@ -162,6 +216,7 @@ void ion_client_destroy(struct ion_client *client);
 
 /**
  * ion_alloc - allocate ion memory
+<<<<<<< HEAD
  * @client:		the client
  * @len:		size of the allocation
  * @align:		requested allocation alignment, lots of hardware blocks
@@ -172,13 +227,25 @@ void ion_client_destroy(struct ion_client *client);
  * @flags:		heap flags, the low 16 bits are consumed by ion, the
  *			high 16 bits are passed on to the respective heap and
  *			can be heap custom
+=======
+ * @client:	the client
+ * @len:	size of the allocation
+ * @align:	requested allocation alignment, lots of hardware blocks have
+ *		alignment requirements of some kind
+ * @flags:	mask of heaps to allocate from, if multiple bits are set
+ *		heaps will be tried in order from lowest to highest order bit
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  *
  * Allocate memory in one of the heaps provided in heap mask and return
  * an opaque handle to it.
  */
 struct ion_handle *ion_alloc(struct ion_client *client, size_t len,
+<<<<<<< HEAD
 			     size_t align, unsigned int heap_id_mask,
 			     unsigned int flags);
+=======
+			     size_t align, unsigned int flags);
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 
 /**
  * ion_free - free a handle
@@ -199,7 +266,11 @@ void ion_free(struct ion_client *client, struct ion_handle *handle);
  * This function queries the heap for a particular handle to get the
  * handle's physical address.  It't output is only correct if
  * a heap returns physically contiguous memory -- in other cases
+<<<<<<< HEAD
  * this api should not be implemented -- ion_sg_table should be used
+=======
+ * this api should not be implemented -- ion_map_dma should be used
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  * instead.  Returns -EINVAL if the handle is invalid.  This has
  * no implications on the reference counting of the handle --
  * the returned value may not be valid if the caller is not
@@ -209,6 +280,7 @@ int ion_phys(struct ion_client *client, struct ion_handle *handle,
 	     ion_phys_addr_t *addr, size_t *len);
 
 /**
+<<<<<<< HEAD
  * ion_map_dma - return an sg_table describing a handle
  * @client:	the client
  * @handle:	the handle
@@ -220,6 +292,8 @@ struct sg_table *ion_sg_table(struct ion_client *client,
 			      struct ion_handle *handle);
 
 /**
+=======
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  * ion_map_kernel - create mapping for the given handle
  * @client:	the client
  * @handle:	handle to map
@@ -237,6 +311,7 @@ void *ion_map_kernel(struct ion_client *client, struct ion_handle *handle);
 void ion_unmap_kernel(struct ion_client *client, struct ion_handle *handle);
 
 /**
+<<<<<<< HEAD
  * ion_share_dma_buf() - share buffer as dma-buf
  * @client:	the client
  * @handle:	the handle
@@ -326,6 +401,65 @@ static inline int ion_handle_get_flags(struct ion_client *client,
 }
 
 #endif /* CONFIG_ION */
+=======
+ * ion_map_dma - create a dma mapping for a given handle
+ * @client:	the client
+ * @handle:	handle to map
+ *
+ * Return an sglist describing the given handle
+ */
+struct scatterlist *ion_map_dma(struct ion_client *client,
+				struct ion_handle *handle);
+
+/**
+ * ion_unmap_dma() - destroy a dma mapping for a handle
+ * @client:	the client
+ * @handle:	handle to unmap
+ */
+void ion_unmap_dma(struct ion_client *client, struct ion_handle *handle);
+
+/**
+ * ion_share() - given a handle, obtain a buffer to pass to other clients
+ * @client:	the client
+ * @handle:	the handle to share
+ *
+ * Given a handle, return a buffer, which exists in a global name
+ * space, and can be passed to other clients.  Should be passed into ion_import
+ * to obtain a new handle for this buffer.
+ *
+ * NOTE: This function does do not an extra reference.  The burden is on the
+ * caller to make sure the buffer doesn't go away while it's being passed to
+ * another client.  That is, ion_free should not be called on this handle until
+ * the buffer has been imported into the other client.
+ */
+struct ion_buffer *ion_share(struct ion_client *client,
+			     struct ion_handle *handle);
+
+/**
+ * ion_import() - given an buffer in another client, import it
+ * @client:	this blocks client
+ * @buffer:	the buffer to import (as obtained from ion_share)
+ *
+ * Given a buffer, add it to the client and return the handle to use to refer
+ * to it further.  This is called to share a handle from one kernel client to
+ * another.
+ */
+struct ion_handle *ion_import(struct ion_client *client,
+			      struct ion_buffer *buffer);
+
+/**
+ * ion_import_fd() - given an fd obtained via ION_IOC_SHARE ioctl, import it
+ * @client:	this blocks client
+ * @fd:		the fd
+ *
+ * A helper function for drivers that will be recieving ion buffers shared
+ * with them from userspace.  These buffers are represented by a file
+ * descriptor obtained as the return from the ION_IOC_SHARE ioctl.
+ * This function coverts that fd into the underlying buffer, and returns
+ * the handle to use to refer to it further.
+ */
+struct ion_handle *ion_import_fd(struct ion_client *client, int fd);
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 #endif /* __KERNEL__ */
 
 /**
@@ -338,21 +472,34 @@ static inline int ion_handle_get_flags(struct ion_client *client,
 
 /**
  * struct ion_allocation_data - metadata passed from userspace for allocations
+<<<<<<< HEAD
  * @len:		size of the allocation
  * @align:		required alignment of the allocation
  * @heap_id_mask:	mask of heap ids to allocate from
  * @flags:		flags passed to heap
  * @handle:		pointer that will be populated with a cookie to use to 
  *			refer to this allocation
+=======
+ * @len:	size of the allocation
+ * @align:	required alignment of the allocation
+ * @flags:	flags passed to heap
+ * @handle:	pointer that will be populated with a cookie to use to refer
+ *		to this allocation
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
  *
  * Provided by userspace as an argument to the ioctl
  */
 struct ion_allocation_data {
 	size_t len;
 	size_t align;
+<<<<<<< HEAD
 	unsigned int heap_mask;
 	unsigned int flags;
 	ion_user_handle_t handle;
+=======
+	unsigned int flags;
+	struct ion_handle *handle;
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 };
 
 /**
@@ -366,7 +513,11 @@ struct ion_allocation_data {
  * provides the file descriptor and the kernel returns the handle.
  */
 struct ion_fd_data {
+<<<<<<< HEAD
 	ion_user_handle_t handle;
+=======
+	struct ion_handle *handle;
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 	int fd;
 };
 
@@ -375,7 +526,11 @@ struct ion_fd_data {
  * @handle:	a handle
  */
 struct ion_handle_data {
+<<<<<<< HEAD
 	ion_user_handle_t handle;
+=======
+	struct ion_handle *handle;
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 };
 
 /**
@@ -390,6 +545,10 @@ struct ion_custom_data {
 	unsigned int cmd;
 	unsigned long arg;
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 #define ION_IOC_MAGIC		'I'
 
 /**
@@ -436,6 +595,7 @@ struct ion_custom_data {
  * descriptor obtained from ION_IOC_SHARE and returns the struct with the handle
  * filed set to the corresponding opaque handle.
  */
+<<<<<<< HEAD
 #define ION_IOC_IMPORT		_IOWR(ION_IOC_MAGIC, 5, struct ion_fd_data)
 
 /**
@@ -447,6 +607,9 @@ struct ion_custom_data {
  * this will make the buffer in memory coherent.
  */
 #define ION_IOC_SYNC		_IOWR(ION_IOC_MAGIC, 7, struct ion_fd_data)
+=======
+#define ION_IOC_IMPORT		_IOWR(ION_IOC_MAGIC, 5, int)
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 
 /**
  * DOC: ION_IOC_CUSTOM - call architecture specific ion ioctl
@@ -456,5 +619,8 @@ struct ion_custom_data {
  */
 #define ION_IOC_CUSTOM		_IOWR(ION_IOC_MAGIC, 6, struct ion_custom_data)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0c38bfd0ed3... gpu: ion: Add ION Memory Manager
 #endif /* _LINUX_ION_H */
