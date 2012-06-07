@@ -119,7 +119,7 @@ static int get_tpkt_data(struct sk_buff *skb, unsigned int protoff,
 			 struct nf_conn *ct, enum ip_conntrack_info ctinfo,
 			 unsigned char **data, int *datalen, int *dataoff)
 {
-	struct nf_ct_h323_master *info = &nfct_help(ct)->help.ct_h323_info;
+	struct nf_ct_h323_master *info = nfct_help_data(ct);
 	int dir = CTINFO2DIR(ctinfo);
 	const struct tcphdr *th;
 	struct tcphdr _tcph;
@@ -636,6 +636,7 @@ static const struct nf_conntrack_expect_policy h245_exp_policy = {
 static struct nf_conntrack_helper nf_conntrack_helper_h245 __read_mostly = {
 	.name			= "H.245",
 	.me			= THIS_MODULE,
+	.data_len		= sizeof(struct nf_ct_h323_master),
 	.tuple.src.l3num	= AF_UNSPEC,
 	.tuple.dst.protonum	= IPPROTO_UDP,
 	.help			= h245_help,
@@ -1207,6 +1208,7 @@ static struct nf_conntrack_helper nf_conntrack_helper_q931[] __read_mostly = {
 	{
 		.name			= "Q.931",
 		.me			= THIS_MODULE,
+		.data_len		= sizeof(struct nf_ct_h323_master),
 		.tuple.src.l3num	= AF_INET,
 		.tuple.src.u.tcp.port	= cpu_to_be16(Q931_PORT),
 		.tuple.dst.protonum	= IPPROTO_TCP,
@@ -1282,7 +1284,7 @@ static int expect_q931(struct sk_buff *skb, struct nf_conn *ct,
 		       unsigned int protoff, unsigned char **data,
 		       TransportAddress *taddr, int count)
 {
-	struct nf_ct_h323_master *info = &nfct_help(ct)->help.ct_h323_info;
+	struct nf_ct_h323_master *info = nfct_help_data(ct);
 	int dir = CTINFO2DIR(ctinfo);
 	int ret = 0;
 	int i;
@@ -1403,7 +1405,7 @@ static int process_rrq(struct sk_buff *skb, struct nf_conn *ct,
 		       unsigned int protoff,
 		       unsigned char **data, RegistrationRequest *rrq)
 {
-	struct nf_ct_h323_master *info = &nfct_help(ct)->help.ct_h323_info;
+	struct nf_ct_h323_master *info = nfct_help_data(ct);
 	int ret;
 	typeof(set_ras_addr_hook) set_ras_addr;
 
@@ -1440,7 +1442,7 @@ static int process_rcf(struct sk_buff *skb, struct nf_conn *ct,
 		       unsigned int protoff,
 		       unsigned char **data, RegistrationConfirm *rcf)
 {
-	struct nf_ct_h323_master *info = &nfct_help(ct)->help.ct_h323_info;
+	struct nf_ct_h323_master *info = nfct_help_data(ct);
 	int dir = CTINFO2DIR(ctinfo);
 	int ret;
 	struct nf_conntrack_expect *exp;
@@ -1490,7 +1492,7 @@ static int process_urq(struct sk_buff *skb, struct nf_conn *ct,
 		       unsigned int protoff,
 		       unsigned char **data, UnregistrationRequest *urq)
 {
-	struct nf_ct_h323_master *info = &nfct_help(ct)->help.ct_h323_info;
+	struct nf_ct_h323_master *info = nfct_help_data(ct);
 	int dir = CTINFO2DIR(ctinfo);
 	int ret;
 	typeof(set_sig_addr_hook) set_sig_addr;
@@ -1524,7 +1526,7 @@ static int process_arq(struct sk_buff *skb, struct nf_conn *ct,
 		       unsigned int protoff,
 		       unsigned char **data, AdmissionRequest *arq)
 {
-	const struct nf_ct_h323_master *info = &nfct_help(ct)->help.ct_h323_info;
+	const struct nf_ct_h323_master *info = nfct_help_data(ct);
 	int dir = CTINFO2DIR(ctinfo);
 	__be16 port;
 	union nf_inet_addr addr;
@@ -1801,6 +1803,7 @@ static struct nf_conntrack_helper nf_conntrack_helper_ras[] __read_mostly = {
 	{
 		.name			= "RAS",
 		.me			= THIS_MODULE,
+		.data_len		= sizeof(struct nf_ct_h323_master),
 		.tuple.src.l3num	= AF_INET,
 		.tuple.src.u.udp.port	= cpu_to_be16(RAS_PORT),
 		.tuple.dst.protonum	= IPPROTO_UDP,
@@ -1810,6 +1813,7 @@ static struct nf_conntrack_helper nf_conntrack_helper_ras[] __read_mostly = {
 	{
 		.name			= "RAS",
 		.me			= THIS_MODULE,
+		.data_len		= sizeof(struct nf_ct_h323_master),
 		.tuple.src.l3num	= AF_INET6,
 		.tuple.src.u.udp.port	= cpu_to_be16(RAS_PORT),
 		.tuple.dst.protonum	= IPPROTO_UDP,
