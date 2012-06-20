@@ -397,6 +397,12 @@ struct nfq_ct_hook {
 	int (*parse)(const struct nlattr *attr, struct nf_conn *ct);
 };
 extern struct nfq_ct_hook __rcu *nfq_ct_hook;
+
+struct nfq_ct_nat_hook {
+	void (*seq_adjust)(struct sk_buff *skb, struct nf_conn *ct,
+			   u32 ctinfo, int off);
+};
+extern struct nfq_ct_nat_hook __rcu *nfq_ct_nat_hook;
 #else
 static inline void nf_ct_attach(struct sk_buff *new, struct sk_buff *skb) {}
 #endif
