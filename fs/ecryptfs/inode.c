@@ -372,7 +372,11 @@ out:
  * Returns zero on success
  */
 int ecryptfs_initialize_file(struct dentry *ecryptfs_dentry,
+<<<<<<< HEAD
 				    struct inode *ecryptfs_inode)
+=======
+			     struct inode *ecryptfs_inode)
+>>>>>>> 47bd3aa3667... eCryptfs: Initialize empty lower files when opening them
 {
 	struct ecryptfs_crypt_stat *crypt_stat =
 		&ecryptfs_inode_to_private(ecryptfs_inode)->crypt_stat;
