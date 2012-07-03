@@ -284,6 +284,8 @@ static int ecryptfs_mmap(struct file *file, struct vm_area_struct *vma)
 		return -ENODEV;
 	return generic_file_mmap(file, vma);
 }
+=======
+>>>>>>> 068478a54bc... eCryptfs: Revert to a writethrough cache model
 
 static int read_or_initialize_metadata(struct dentry *dentry)
 {
