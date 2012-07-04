@@ -24,7 +24,11 @@
 #include <linux/kthread.h>
 #include <linux/mutex.h>
 #include <linux/freezer.h>
+<<<<<<< HEAD
 #include <linux/usb/otg.h>
+=======
+#include <linux/random.h>
+>>>>>>> 76b9be5d7fe... usb: feed USB device information to the /dev/random driver
 
 #include <asm/uaccess.h>
 #include <asm/byteorder.h>
@@ -2053,6 +2057,14 @@ int usb_new_device(struct usb_device *udev)
 #endif
 	call_battery_notify(udev, 1);
 #endif
+	if (udev->serial)
+		add_device_randomness(udev->serial, strlen(udev->serial));
+	if (udev->product)
+		add_device_randomness(udev->product, strlen(udev->product));
+	if (udev->manufacturer)
+		add_device_randomness(udev->manufacturer,
+				      strlen(udev->manufacturer));
+
 	device_enable_async_suspend(&udev->dev);
 
 	/*
