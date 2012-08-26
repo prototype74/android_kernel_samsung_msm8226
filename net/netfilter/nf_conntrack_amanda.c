@@ -156,8 +156,8 @@ static int amanda_help(struct sk_buff *skb,
 
 		nf_nat_amanda = rcu_dereference(nf_nat_amanda_hook);
 		if (nf_nat_amanda && ct->status & IPS_NAT_MASK)
-			ret = nf_nat_amanda(skb, ctinfo, off - dataoff,
-					    len, exp);
+			ret = nf_nat_amanda(skb, ctinfo, protoff,
+					    off - dataoff, len, exp);
 		else if (nf_ct_expect_related(exp) != 0)
 			ret = NF_DROP;
 		nf_ct_expect_put(exp);
