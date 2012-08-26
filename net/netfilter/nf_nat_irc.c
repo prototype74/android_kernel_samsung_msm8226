@@ -28,6 +28,7 @@ MODULE_ALIAS("ip_nat_irc");
 
 static unsigned int help(struct sk_buff *skb,
 			 enum ip_conntrack_info ctinfo,
+			 unsigned int protoff,
 			 unsigned int matchoff,
 			 unsigned int matchlen,
 			 struct nf_conntrack_expect *exp)
@@ -59,7 +60,7 @@ static unsigned int help(struct sk_buff *skb,
 		return NF_DROP;
 
 	ret = nf_nat_mangle_tcp_packet(skb, exp->master, ctinfo,
-				       matchoff, matchlen, buffer,
+				       protoff, matchoff, matchlen, buffer,
 				       strlen(buffer));
 	if (ret != NF_ACCEPT)
 		nf_ct_unexpect_related(exp);
