@@ -1478,8 +1478,7 @@ static int process_sip_msg(struct sk_buff *skb, struct nf_conn *ct,
 	else
 		ret = process_sip_response(skb, protoff, dataoff, dptr, datalen);
 
-	if (ret == NF_ACCEPT && nf_ct_l3num(ct) == NFPROTO_IPV4 &&
-	    ct->status & IPS_NAT_MASK) {
+	if (ret == NF_ACCEPT && ct->status & IPS_NAT_MASK) {
 		nf_nat_sip = rcu_dereference(nf_nat_sip_hook);
 		if (nf_nat_sip && !nf_nat_sip(skb, protoff, dataoff,
 					      dptr, datalen))
@@ -1562,8 +1561,7 @@ static int sip_help_tcp(struct sk_buff *skb, unsigned int protoff,
 		datalen  = datalen + diff - msglen;
 	}
 
-	if (ret == NF_ACCEPT && nf_ct_l3num(ct) == NFPROTO_IPV4 &&
-	    ct->status & IPS_NAT_MASK) {
+	if (ret == NF_ACCEPT && ct->status & IPS_NAT_MASK) {
 		nf_nat_sip_seq_adjust = rcu_dereference(nf_nat_sip_seq_adjust_hook);
 		if (nf_nat_sip_seq_adjust)
 			nf_nat_sip_seq_adjust(skb, protoff, tdiff);
