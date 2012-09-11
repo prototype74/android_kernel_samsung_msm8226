@@ -15,7 +15,8 @@
  * Convert from extended attribute to in-memory representation.
  */
 struct posix_acl *
-posix_acl_from_xattr(const void *value, size_t size)
+posix_acl_from_xattr(struct user_namespace *user_ns,
+		     const void *value, size_t size)
 {
 	posix_acl_xattr_header *header = (posix_acl_xattr_header *)value;
 	posix_acl_xattr_entry *entry = (posix_acl_xattr_entry *)(header+1), *end;
@@ -74,7 +75,8 @@ EXPORT_SYMBOL (posix_acl_from_xattr);
  * Convert from in-memory to extended attribute representation.
  */
 int
-posix_acl_to_xattr(const struct posix_acl *acl, void *buffer, size_t size)
+posix_acl_to_xattr(struct user_namespace *user_ns, const struct posix_acl *acl,
+		   void *buffer, size_t size)
 {
 	posix_acl_xattr_header *ext_acl = (posix_acl_xattr_header *)buffer;
 	posix_acl_xattr_entry *ext_entry = ext_acl->a_entries;
