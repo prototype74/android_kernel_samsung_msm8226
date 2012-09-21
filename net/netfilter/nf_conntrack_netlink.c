@@ -1224,7 +1224,10 @@ ctnetlink_change_helper(struct nf_conn *ct, const struct nlattr * const cda[])
 	}
 
 	if (help) {
-		if (help->helper == helper)
+		if (help->helper == helper) {
+			/* update private helper data if allowed. */
+			if (helper->from_nlattr)
+				helper->from_nlattr(helpinfo, ct);
 			return 0;
 		if (help->helper)
 			return -EBUSY;
@@ -1461,6 +1464,9 @@ ctnetlink_create_conntrack(struct net *net, u16 zone,
 				err = -ENOMEM;
 				goto err2;
 			}
+			/* set private helper data if allowed. */
+			if (helper->from_nlattr)
+				helper->from_nlattr(helpinfo, ct);
 
 			/* not in hash table yet so not strictly necessary */
 			RCU_INIT_POINTER(help->helper, helper);
