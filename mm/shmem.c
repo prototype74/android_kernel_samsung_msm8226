@@ -1254,7 +1254,6 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
 	}
 #endif
 	vma->vm_ops = &shmem_vm_ops;
-	vma->vm_flags |= VM_CAN_NONLINEAR;
 	return 0;
 }
 
@@ -2583,6 +2582,7 @@ static const struct vm_operations_struct shmem_vm_ops = {
 	.set_policy     = shmem_set_policy,
 	.get_policy     = shmem_get_policy,
 #endif
+	.remap_pages	= generic_file_remap_pages,
 };
 
 static struct dentry *shmem_mount(struct file_system_type *fs_type,
@@ -2771,7 +2771,6 @@ void shmem_set_file(struct vm_area_struct *vma, struct file *file)
 		fput(vma->vm_file);
 	vma->vm_file = file;
 	vma->vm_ops = &shmem_vm_ops;
-	vma->vm_flags |= VM_CAN_NONLINEAR;
 }
 
 /**
