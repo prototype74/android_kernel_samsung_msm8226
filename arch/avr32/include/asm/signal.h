@@ -1,5 +1,12 @@
-#ifndef _ASMARM_SIGNAL_H
-#define _ASMARM_SIGNAL_H
+/*
+ * Copyright (C) 2004-2006 Atmel Corporation
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+#ifndef __ASM_AVR32_SIGNAL_H
+#define __ASM_AVR32_SIGNAL_H
 
 #include <linux/types.h>
 
@@ -68,9 +75,7 @@ typedef unsigned long sigset_t;
 
 /* These should not be considered constants from userland.  */
 #define SIGRTMIN	32
-#define SIGRTMAX	_NSIG
-
-#define SIGSWI		32
+#define SIGRTMAX	(_NSIG-1)
 
 /*
  * SA_FLAGS values:
@@ -78,9 +83,7 @@ typedef unsigned long sigset_t;
  * SA_NOCLDSTOP		flag to turn off SIGCHLD when children stop.
  * SA_NOCLDWAIT		flag on SIGCHLD to inhibit zombies.
  * SA_SIGINFO		deliver the signal with SIGINFO structs
- * SA_THIRTYTWO		delivers the signal in 32-bit mode, even if the task 
- *			is running in 26-bit.
- * SA_ONSTACK		allows alternate signal stacks (see sigaltstack(2)).
+ * SA_ONSTACK		indicates that a registered stack_t will be used.
  * SA_RESTART		flag to get restarting signals (which were the default long ago)
  * SA_NODEFER		prevents the current signal from being masked in the handler.
  * SA_RESETHAND		clears the handler when the signal is delivered.
@@ -91,7 +94,6 @@ typedef unsigned long sigset_t;
 #define SA_NOCLDSTOP	0x00000001
 #define SA_NOCLDWAIT	0x00000002
 #define SA_SIGINFO	0x00000004
-#define SA_THIRTYTWO	0x02000000
 #define SA_RESTORER	0x04000000
 #define SA_ONSTACK	0x08000000
 #define SA_RESTART	0x10000000
@@ -101,8 +103,7 @@ typedef unsigned long sigset_t;
 #define SA_NOMASK	SA_NODEFER
 #define SA_ONESHOT	SA_RESETHAND
 
-
-/* 
+/*
  * sigaltstack controls
  */
 #define SS_ONSTACK	1
@@ -132,14 +133,13 @@ struct sigaction {
 struct k_sigaction {
 	struct sigaction sa;
 };
-
 #else
 /* Here we must cater to libcs that poke about in kernel headers.  */
 
 struct sigaction {
 	union {
-	  __sighandler_t _sa_handler;
-	  void (*_sa_sigaction)(int, struct siginfo *, void *);
+		__sighandler_t _sa_handler;
+		void (*_sa_sigaction)(int, struct siginfo *, void *);
 	} _u;
 	sigset_t sa_mask;
 	unsigned long sa_flags;
@@ -158,8 +158,12 @@ typedef struct sigaltstack {
 } stack_t;
 
 #ifdef __KERNEL__
+
 #include <asm/sigcontext.h>
+#undef __HAVE_ARCH_SIG_BITOPS
+
 #define ptrace_signal_deliver(regs, cookie) do { } while (0)
-#endif
+
+#endif /* __KERNEL__ */
 
 #endif
