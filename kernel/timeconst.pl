@@ -369,7 +369,7 @@ if ($hz eq '--can') {
 		die "Usage: $0 HZ\n";
 	}
 
-	@val = @{$canned_values{$hz}};
+	$cv = $canned_values{$hz};
 	@val = defined($cv) ? @$cv : compute_values($hz);
 	output($hz, @val);
 }
