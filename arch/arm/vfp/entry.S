@@ -10,7 +10,7 @@
  *
  * Basic entry code, called from the kernel's undefined instruction trap.
  *  r0  = faulted instruction
- *  r2  = faulted PC+4
+ *  r5  = faulted PC+4
  *  r9  = successful return
  *  r10 = thread_info structure
  *  lr  = failure return
