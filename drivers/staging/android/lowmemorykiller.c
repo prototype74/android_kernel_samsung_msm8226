@@ -30,6 +30,8 @@
  *
  */
 
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/mm.h>
@@ -84,7 +86,7 @@ static unsigned long lowmem_deathpending_timeout;
 #define lowmem_print(level, x...)			\
 	do {						\
 		if (lowmem_debug_level >= (level))	\
-			printk(x);			\
+			pr_info(x);			\
 	} while (0)
 #if defined(CONFIG_SEC_DEBUG_LMK_MEMINFO)
 static void dump_tasks_info(void)
@@ -156,6 +158,7 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	int tasksize;
 	int i;
 	int min_score_adj = OOM_SCORE_ADJ_MAX + 1;
+	int minfree = 0;
 	int selected_tasksize = 0;
 	int selected_oom_score_adj;
 #ifdef CONFIG_SAMP_HOTNESS
@@ -218,8 +221,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	if (lowmem_minfree_size < array_size)
 		array_size = lowmem_minfree_size;
 	for (i = 0; i < array_size; i++) {
-		if (other_free < lowmem_minfree[i] &&
-		    other_file < lowmem_minfree[i]) {
+		minfree = lowmem_minfree[i];
+		if (other_free < minfree && other_file < minfree) {
 			min_score_adj = lowmem_adj[i];
 			break;
 		}
