@@ -52,7 +52,6 @@
 #define ST_LOG(fmt,...)
 #endif
 
-#define CREATE_TRACE_POINTS
 #include <trace/events/mmc.h>
 
 static void mmc_clk_scaling(struct mmc_host *host, bool from_wq);
