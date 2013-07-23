@@ -299,7 +299,6 @@ extern int dhd_write_macaddr(struct ether_addr *mac);
 #else
 static inline int dhd_write_macaddr(struct ether_addr *mac) { return 0; }
 #endif
-<<<<<<< HEAD
 #endif /* CUSTOMER_HW4 */
 
 #ifdef ENABLE_CONTROL_SCHED
@@ -337,27 +336,14 @@ typedef struct dhd_if_event {
 	uint8			mac[ETHER_ADDR_LEN];
 } dhd_if_event_t;
 
-=======
-struct ipv6_addr {
-	char			ipv6_addr[IPV6_ADDR_LEN];
-	dhd_ipv6_op_t		ipv6_oper;
-	struct list_head	list;
-};
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 /* Interface control information */
 typedef struct dhd_if {
 	struct dhd_info *info;			/* back pointer to dhd_info */
 	/* OS/stack specifics */
 	struct net_device *net;
 	struct net_device_stats stats;
-<<<<<<< HEAD
 	int 			idx;			/* iface idx in dongle */
 	uint 			subunit;		/* subunit */
-=======
-	int idx;			/* iface idx in dongle */
-	dhd_if_state_t state;			/* interface state */
-	uint			subunit;		/* subunit */
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 	uint8			mac_addr[ETHER_ADDR_LEN];	/* assigned MAC address */
 	bool			attached;		/* Delayed attachment when unset */
 	bool			txflowcontrol;	/* Per interface flow control indicator */
@@ -365,12 +351,6 @@ typedef struct dhd_if {
 	uint8			bssidx;			/* bsscfg index for the interface */
 	bool			set_macaddress;
 	bool			set_multicast;
-<<<<<<< HEAD
-=======
-	struct			list_head ipv6_list;
-	spinlock_t		ipv6_lock;
-	bool			event2cfg80211;	/* To determine if pass event to cfg80211 */
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 } dhd_if_t;
 
 #ifdef WLMEDIA_HTSF
@@ -1704,22 +1684,9 @@ done:
 static void
 dhd_ifdel_event_handler(void *handle, void *event_info, u8 event)
 {
-<<<<<<< HEAD
 	dhd_info_t *dhd = handle;
 	int ifidx;
 	dhd_if_event_t *if_event = event_info;
-=======
-	tsk_ctl_t *tsk = (tsk_ctl_t *)data;
-	dhd_info_t *dhd = (dhd_info_t *)tsk->parent;
-	struct ipv6_addr *iter, *next;
-	int i, ret;
-#ifdef SOFTAP
-	bool in_ap = FALSE;
-	unsigned long flags;
-#endif
-
-	while (down_interruptible(&tsk->sema) == 0) {
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 
 
 	if (event != DHD_WQ_WORK_IF_DEL) {
@@ -1737,54 +1704,8 @@ dhd_ifdel_event_handler(void *handle, void *event_info, u8 event)
 		return;
 	}
 
-<<<<<<< HEAD
 	dhd_net_if_lock_local(dhd);
 	DHD_OS_WAKE_LOCK(&dhd->pub);
-=======
-				}
-				list_for_each_entry_safe(iter, next, &dhd->iflist[i]->ipv6_list, list) {
-					spin_lock_bh(&dhd->iflist[i]->ipv6_lock);
-					list_del(&iter->list);
-					spin_unlock_bh(&dhd->iflist[i]->ipv6_lock);
-					if (iter->ipv6_oper == DHD_IPV6_ADDR_ADD) {
-						ret = dhd_ndo_enable(&dhd->pub, TRUE);
-						if (ret < 0) {
-							DHD_ERROR(("%s: Enabling NDO Failed %d\n",
-								__FUNCTION__, ret));
-							continue;
-						}
-						ret = dhd_ndo_add_ip(&dhd->pub,
-							(char *)&iter->ipv6_addr[0], i);
-						if (ret < 0) {
-							DHD_ERROR(("%s: Adding host ip fail %d\n",
-								__FUNCTION__, ret));
-							continue;
-						}
-					} else {
-						ret = dhd_ndo_remove_ip(&dhd->pub, i);
-						if (ret < 0) {
-							DHD_ERROR(("%s: Removing host ip fail %d\n",
-								__FUNCTION__, ret));
-							continue;
-						}
-					}
-					NATIVE_MFREE(dhd->pub.osh, iter, sizeof(struct ipv6_addr));
-				}
-				if (dhd->set_macaddress == i+1) {
-					dhd->set_macaddress = 0;
-					if (_dhd_set_mac_address(dhd, i, &dhd->macvalue) == 0) {
-						DHD_INFO((
-							"%s: MACID is overwritten\n",
-							__FUNCTION__));
-					} else {
-						DHD_ERROR((
-							"%s: _dhd_set_mac_address() failed\n",
-							__FUNCTION__));
-					}
-				}
-			}
-		}
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 
 	ifidx = if_event->event.ifidx;
 	DHD_TRACE(("Removing interface with idx %d\n", ifidx));
@@ -3628,7 +3549,6 @@ dhd_stop(struct net_device *net)
 #endif  /* CUSTOMER_HW4 && PLATFORM_SLP */
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	DHD_TRACE(("%s: Enter %p\n", __FUNCTION__, net));
-
 	if (dhd->pub.up == 0) {
 		goto exit;
 	}
@@ -4154,32 +4074,11 @@ dhd_allocate_if(dhd_pub_t *dhdpub, int ifidx, char *name,
 	}
 
 	memset(ifp, 0, sizeof(dhd_if_t));
-<<<<<<< HEAD
 	ifp->info = dhdinfo;
 	ifp->idx = ifidx;
 	ifp->bssidx = bssidx;
 	if (mac != NULL)
 		memcpy(&ifp->mac_addr, mac, ETHER_ADDR_LEN);
-=======
-	ifp->event2cfg80211 = FALSE;
-	ifp->info = dhd;
-	dhd->iflist[ifidx] = ifp;
-	strncpy(ifp->name, name, IFNAMSIZ);
-	ifp->name[IFNAMSIZ] = '\0';
-	INIT_LIST_HEAD(&ifp->ipv6_list);
-	spin_lock_init(&ifp->ipv6_lock);
-	if (mac_addr != NULL)
-		memcpy(&ifp->mac_addr, mac_addr, ETHER_ADDR_LEN);
-
-	if (handle == NULL) {
-		ifp->state = DHD_IF_ADD;
-		ifp->idx = ifidx;
-		ifp->bssidx = bssidx;
-		ASSERT(dhd->thr_sysioc_ctl.thr_pid >= 0);
-		up(&dhd->thr_sysioc_ctl.sema);
-	} else
-		ifp->net = (struct net_device *)handle;
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 
 	/* Allocate etherdev, including space for private structure */
 	ifp->net = alloc_etherdev(sizeof(dhdinfo));
@@ -6113,24 +6012,15 @@ static int dhd_inet6addr_notifier_call(struct notifier_block *this,
 {
 	dhd_info_t *dhd;
 	dhd_pub_t *dhd_pub;
-	struct ipv6_addr *_ipv6_addr;
 	struct inet6_ifaddr *inet6_ifa = ptr;
-<<<<<<< HEAD
 	struct in6_addr *ipv6_addr = &inet6_ifa->addr;
 	struct ipv6_work_info_t *ndo_info;
 	int idx = 0; /* REVISIT */
-=======
-	int idx = 0;
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 31))
 	/* Filter notifications meant for non Broadcom devices */
 	if (inet6_ifa->idev->dev->netdev_ops != &dhd_ops_pri) {
-<<<<<<< HEAD
 			return NOTIFY_DONE;
-=======
-		goto exit;
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 	}
 #endif /* LINUX_VERSION_CODE */
 
@@ -6142,7 +6032,6 @@ static int dhd_inet6addr_notifier_call(struct notifier_block *this,
 		return NOTIFY_DONE;
 	dhd_pub = &dhd->pub;
 	if (!FW_SUPPORTED(dhd_pub, ndoe))
-<<<<<<< HEAD
 		return NOTIFY_DONE;
 
 	ndo_info = (struct ipv6_work_info_t *)kzalloc(sizeof(struct ipv6_work_info_t), GFP_ATOMIC);
@@ -6158,36 +6047,6 @@ static int dhd_inet6addr_notifier_call(struct notifier_block *this,
 	/* defer the work to thread as it may block kernel */
 	dhd_deferred_schedule_work((void *)ndo_info, DHD_WQ_WORK_IPV6_NDO,
 		dhd_inet6_work_handler, DHD_WORK_PRIORITY_LOW);
-=======
-		goto exit;
-	_ipv6_addr = NATIVE_MALLOC(dhd_pub->osh, sizeof(struct ipv6_addr));
-	if (_ipv6_addr == NULL) {
-		DHD_ERROR(("Failed to allocate ipv6\n"));
-		goto exit;
-	}
-
-	memcpy(&_ipv6_addr->ipv6_addr[0], &inet6_ifa->addr, IPV6_ADDR_LEN);
-
-	DHD_TRACE(("IPV6 address : %pI6\n", &inet6_ifa->addr));
-	switch (event) {
-		case NETDEV_UP:
-			DHD_TRACE(("%s: Enable NDO and add ipv6 into table \n ", __FUNCTION__));
-			_ipv6_addr->ipv6_oper = DHD_IPV6_ADDR_ADD;
-			break;
-		case NETDEV_DOWN:
-			DHD_TRACE(("%s: clear ipv6 table \n", __FUNCTION__));
-			_ipv6_addr->ipv6_oper = DHD_IPV6_ADDR_DELETE;
-			break;
-		default:
-			DHD_ERROR(("%s: unknown notifier event \n", __FUNCTION__));
-			goto exit;
-	}
-	spin_lock_bh(&dhd->iflist[idx]->ipv6_lock);
-	list_add_tail(&_ipv6_addr->list, &dhd->iflist[idx]->ipv6_list);
-	spin_unlock_bh(&dhd->iflist[idx]->ipv6_lock);
-	up(&dhd->thr_sysioc_ctl.sema);
-exit:
->>>>>>> 4ce80b6b8ec... net: wireless: bcmdhd: Fix NDO functionality
 	return NOTIFY_DONE;
 }
 
