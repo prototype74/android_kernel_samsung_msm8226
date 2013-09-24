@@ -1,5 +1,12 @@
-#ifndef _ASMARM_SOCKET_H
-#define _ASMARM_SOCKET_H
+#ifndef _ASM_POWERPC_SOCKET_H
+#define _ASM_POWERPC_SOCKET_H
+
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or (at your option) any later version.
+ */
 
 #include <asm/sockios.h>
 
@@ -23,25 +30,25 @@
 #define SO_LINGER	13
 #define SO_BSDCOMPAT	14
 /* To add :#define SO_REUSEPORT 15 */
-#define SO_PASSCRED	16
-#define SO_PEERCRED	17
-#define SO_RCVLOWAT	18
-#define SO_SNDLOWAT	19
-#define SO_RCVTIMEO	20
-#define SO_SNDTIMEO	21
+#define SO_RCVLOWAT	16
+#define SO_SNDLOWAT	17
+#define SO_RCVTIMEO	18
+#define SO_SNDTIMEO	19
+#define SO_PASSCRED	20
+#define SO_PEERCRED	21
 
 /* Security levels - as per NRL IPv6 - don't actually do anything */
 #define SO_SECURITY_AUTHENTICATION		22
 #define SO_SECURITY_ENCRYPTION_TRANSPORT	23
 #define SO_SECURITY_ENCRYPTION_NETWORK		24
 
-#define SO_BINDTODEVICE 25
+#define SO_BINDTODEVICE	25
 
 /* Socket filtering */
-#define SO_ATTACH_FILTER        26
-#define SO_DETACH_FILTER        27
+#define SO_ATTACH_FILTER	26
+#define SO_DETACH_FILTER	27
 
-#define SO_PEERNAME             28
+#define SO_PEERNAME		28
 #define SO_TIMESTAMP		29
 #define SCM_TIMESTAMP		SO_TIMESTAMP
 
@@ -68,7 +75,7 @@
 
 /* Instruct lower device to use last 4-bytes of skb data as FCS */
 #define SO_NOFCS		43
+
 #define SO_MAX_PACING_RATE	44
 
-#define SO_SET_DOMAIN_NAME 51
-#endif /* _ASM_SOCKET_H */
+#endif	/* _ASM_POWERPC_SOCKET_H */

@@ -1,5 +1,14 @@
-#ifndef _ASMARM_SOCKET_H
-#define _ASMARM_SOCKET_H
+#ifndef _ASM_IA64_SOCKET_H
+#define _ASM_IA64_SOCKET_H
+
+/*
+ * Socket related defines.
+ *
+ * Based on <asm-i386/socket.h>.
+ *
+ * Modified 1998-2000
+ *	David Mosberger-Tang <davidm@hpl.hp.com>, Hewlett-Packard Co
+ */
 
 #include <asm/sockios.h>
 
@@ -35,19 +44,19 @@
 #define SO_SECURITY_ENCRYPTION_TRANSPORT	23
 #define SO_SECURITY_ENCRYPTION_NETWORK		24
 
-#define SO_BINDTODEVICE 25
+#define SO_BINDTODEVICE		25
 
 /* Socket filtering */
-#define SO_ATTACH_FILTER        26
-#define SO_DETACH_FILTER        27
+#define SO_ATTACH_FILTER	26
+#define SO_DETACH_FILTER	27
 
-#define SO_PEERNAME             28
+#define SO_PEERNAME		28
 #define SO_TIMESTAMP		29
 #define SCM_TIMESTAMP		SO_TIMESTAMP
 
 #define SO_ACCEPTCONN		30
 
-#define SO_PEERSEC		31
+#define SO_PEERSEC             31
 #define SO_PASSSEC		34
 #define SO_TIMESTAMPNS		35
 #define SCM_TIMESTAMPNS		SO_TIMESTAMPNS
@@ -68,7 +77,7 @@
 
 /* Instruct lower device to use last 4-bytes of skb data as FCS */
 #define SO_NOFCS		43
+
 #define SO_MAX_PACING_RATE	44
 
-#define SO_SET_DOMAIN_NAME 51
-#endif /* _ASM_SOCKET_H */
+#endif /* _ASM_IA64_SOCKET_H */
