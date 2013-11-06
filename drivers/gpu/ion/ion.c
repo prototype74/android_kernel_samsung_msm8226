@@ -402,16 +402,13 @@ int ion_handle_put(struct ion_handle *handle)
 static struct ion_handle *ion_handle_lookup(struct ion_client *client,
 					    struct ion_buffer *buffer)
 {
-	struct rb_node *n = client->handles.rb_node;
+	struct rb_node *n;
 
-	while (n) {
-		struct ion_handle *entry = rb_entry(n, struct ion_handle, node);
-		if (buffer < entry->buffer)
-			n = n->rb_left;
-		else if (buffer > entry->buffer)
-			n = n->rb_right;
-		else
-			return entry;
+	for (n = rb_first(&client->handles); n; n = rb_next(n)) {
+		struct ion_handle *handle = rb_entry(n, struct ion_handle,
+						   node);
+		if (handle->buffer == buffer)
+			return handle;
 	}
 	return NULL;
 }
@@ -469,9 +466,9 @@ static int ion_handle_add(struct ion_client *client, struct ion_handle *handle)
 		parent = *p;
 		entry = rb_entry(parent, struct ion_handle, node);
 
-		if (handle->buffer < entry->buffer)
+		if (handle < entry)
 			p = &(*p)->rb_left;
-		else if (handle->buffer > entry->buffer)
+		else if (handle > entry)
 			p = &(*p)->rb_right;
 		else
 			WARN(1, "%s: buffer already found.", __func__);
