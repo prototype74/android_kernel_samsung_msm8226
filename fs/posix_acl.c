@@ -1,10 +1,8 @@
 /*
- * linux/fs/posix_acl.c
+ * Copyright (C) 2002,2003 by Andreas Gruenbacher <a.gruenbacher@computer.org>
  *
- *  Copyright (C) 2002 by Andreas Gruenbacher <a.gruenbacher@computer.org>
- *
- *  Fixes from William Schumacher incorporated on 15 March 2001.
- *     (Reported by Charles Bertsch, <CBertsch@microtest.com>).
+ * Fixes from William Schumacher incorporated on 15 March 2001.
+ *    (Reported by Charles Bertsch, <CBertsch@microtest.com>).
  */
 
 /*
@@ -18,9 +16,9 @@
 #include <linux/fs.h>
 #include <linux/sched.h>
 #include <linux/posix_acl.h>
+#include <linux/posix_acl_xattr.h>
 #include <linux/export.h>
-
-#include <linux/errno.h>
+#include <linux/user_namespace.h>
 
 EXPORT_SYMBOL(posix_acl_init);
 EXPORT_SYMBOL(posix_acl_alloc);
