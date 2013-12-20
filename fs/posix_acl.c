@@ -17,6 +17,7 @@
 #include <linux/sched.h>
 #include <linux/posix_acl.h>
 #include <linux/posix_acl_xattr.h>
+#include <linux/xattr.h>
 #include <linux/export.h>
 #include <linux/user_namespace.h>
 
