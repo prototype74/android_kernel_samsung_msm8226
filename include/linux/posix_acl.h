@@ -188,4 +188,6 @@ static inline int posix_acl_create(struct inode *inode, umode_t *mode,
 }
 #endif /* CONFIG_FS_POSIX_ACL */
 
+struct posix_acl *get_acl(struct inode *inode, int type);
+
 #endif  /* __LINUX_POSIX_ACL_H */
