@@ -565,8 +565,7 @@ static void type_attribute_bounds_av(struct context *scontext,
 		context_struct_compute_av(&lo_scontext,
 					  tcontext,
 					  tclass,
-					  &lo_avd,
-					  NULL);
+					  &lo_avd);
 		if ((lo_avd.allowed & avd->allowed) == avd->allowed)
 			return;		/* no masked permission */
 		masked = ~lo_avd.allowed & avd->allowed;
@@ -581,8 +580,7 @@ static void type_attribute_bounds_av(struct context *scontext,
 		context_struct_compute_av(scontext,
 					  &lo_tcontext,
 					  tclass,
-					  &lo_avd,
-					  NULL);
+					  &lo_avd);
 		if ((lo_avd.allowed & avd->allowed) == avd->allowed)
 			return;		/* no masked permission */
 		masked = ~lo_avd.allowed & avd->allowed;
@@ -598,8 +596,7 @@ static void type_attribute_bounds_av(struct context *scontext,
 		context_struct_compute_av(&lo_scontext,
 					  &lo_tcontext,
 					  tclass,
-					  &lo_avd,
-					  NULL);
+					  &lo_avd);
 		if ((lo_avd.allowed & avd->allowed) == avd->allowed)
 			return;		/* no masked permission */
 		masked = ~lo_avd.allowed & avd->allowed;
@@ -693,9 +690,9 @@ static void context_struct_compute_av(struct context *scontext,
 			     node;
 			     node = avtab_search_node_next(node, avkey.specified)) {
 				if (node->key.specified == AVTAB_ALLOWED)
-					avd->allowed |= node->datum.u.data;
+					avd->allowed |= node->datum.data;
 				else if (node->key.specified == AVTAB_AUDITALLOW)
-					avd->auditallow |= node->datum.u.data;
+					avd->auditallow |= node->datum.data;
 				else if (node->key.specified == AVTAB_AUDITDENY)
 					avd->auditdeny &= node->datum.u.data;
 				else if (xperms && (node->key.specified & AVTAB_XPERMS))
@@ -1169,7 +1166,7 @@ void security_compute_av_user(u32 ssid,
 		goto out;
 	}
 
-	context_struct_compute_av(scontext, tcontext, tclass, avd, NULL);
+	context_struct_compute_av(scontext, tcontext, tclass, avd);
  out:
 	read_unlock(&policy_rwlock);
 	return;
@@ -1690,7 +1687,7 @@ static int security_compute_sid(u32 ssid,
 
 	if (avdatum) {
 		/* Use the type from the type transition/member/change rule. */
-		newcontext.type = avdatum->u.data;
+		newcontext.type = avdatum->data;
 	}
 
 	/* if we have a objname this is a file trans check so check those rules */
