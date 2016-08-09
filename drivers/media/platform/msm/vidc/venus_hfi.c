@@ -1460,7 +1460,7 @@ static inline int venus_hfi_clk_gating_off(struct venus_hfi_device *device)
 {
 	int rc = 0;
 	if (!device) {
-		dprintk(VIDC_ERR, "Invalid params: %p\n", device);
+		dprintk(VIDC_ERR, "Invalid params: %pK\n", device);
 		return -EINVAL;
 	}
 	if (device->clk_state == ENABLED_PREPARED) {
