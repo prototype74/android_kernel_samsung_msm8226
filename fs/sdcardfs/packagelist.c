@@ -499,7 +499,7 @@ static inline struct package_appid *to_package_appid(struct config_item *item)
 CONFIGFS_ATTR_STRUCT(package_details);
 #define PACKAGE_DETAILS_ATTR(_name, _mode, _show, _store)	\
 struct package_details_attribute package_details_attr_##_name = __CONFIGFS_ATTR(_name, _mode, _show, _store)
-#define PACKAGE_DETAILS_ATTRIBUTE(name) &package_details_attr_##name.attr
+#define PACKAGE_DETAILS_ATTRIBUTE(name) (&package_details_attr_##name.attr)
 
 static ssize_t package_appid_attr_show(struct config_item *item,
 				      struct configfs_attribute *attr,
@@ -749,7 +749,13 @@ static inline struct sdcardfs_packages *to_sdcardfs_packages(struct config_item 
 	return item ? container_of(to_config_group(item), struct sdcardfs_packages, group) : NULL;
 }
 
-static struct config_item *sdcardfs_packages_make_item(struct config_group *group, const char *name)
+CONFIGFS_ATTR_STRUCT(packages);
+#define PACKAGES_ATTR(_name, _mode, _show, _store)	\
+struct packages_attribute packages_attr_##_name = __CONFIGFS_ATTR(_name, _mode, _show, _store)
+#define PACKAGES_ATTR_RO(_name, _show)	\
+struct packages_attribute packages_attr_##_name = __CONFIGFS_ATTR_RO(_name, _show)
+
+static struct config_item *packages_make_item(struct config_group *group, const char *name)
 {
 	struct package_details *package_details;
 	const char *tmp;
