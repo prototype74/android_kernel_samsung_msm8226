@@ -1,10 +1,16 @@
 # SEPerienceKernel rules #
-/build_kernel.sh
+/build_seperience.sh
 
-# Compiled source #
+# Compiled source
 *.o
+*.o.*
+*.ko
 *.so
 
-# Packages #
+# Packages
 *.gz
 *.image
+
+# Other files
+*.mod.c
+*.orig
