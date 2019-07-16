@@ -61,7 +61,7 @@ static long msm_sensor_driver_cmd(struct msm_sensor_init_t *s_init, void *arg)
 
 	/* Validate input parameters */
 	if (!s_init || !cfg) {
-		pr_err("failed: s_init %p cfg %p", s_init, cfg);
+		pr_err("failed: s_init %pK cfg %pK", s_init, cfg);
 		return -EINVAL;
 	}
 
@@ -89,7 +89,7 @@ static long msm_sensor_init_subdev_ioctl(struct v4l2_subdev *sd,
 
 	/* Validate input parameters */
 	if (!s_init) {
-		pr_err("failed: s_init %p", s_init);
+		pr_err("failed: s_init %pK", s_init);
 		return -EINVAL;
 	}
 
@@ -360,7 +360,6 @@ static int __init msm_sensor_init_module(void)
 	s_init = kzalloc(sizeof(struct msm_sensor_init_t), GFP_KERNEL);
 	if (!s_init) {
 		class_destroy(camera_class);
-		pr_err("failed: no memory s_init %p", NULL);
 		return -ENOMEM;
 	}
 

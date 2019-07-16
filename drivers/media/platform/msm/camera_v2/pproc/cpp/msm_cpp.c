@@ -967,7 +967,7 @@ static int cpp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 		return -ENODEV;
 	}
 
-	CPP_DBG("open %d %p\n", i, &fh->vfh);
+	CPP_DBG("open %d %pK\n", i, &fh->vfh);
 	cpp_dev->cpp_open_cnt++;
 	if (cpp_dev->cpp_open_cnt == 1) {
 		cpp_init_hardware(cpp_dev);
@@ -1149,7 +1149,7 @@ static void msm_cpp_do_timeout_work(struct work_struct *work)
 		jiffies);
 
 	if (!work) {
-		pr_err("Invalid work:%p\n",work);
+		pr_err("Invalid work:%pK\n",work);
 			mutex_unlock(&cpp_timers.data.cpp_dev->mutex);
 		return;
 	}
@@ -1495,7 +1495,10 @@ long msm_cpp_subdev_ioctl(struct v4l2_subdev *sd,
 		pr_err("cpp_dev is null\n");
 		return -EINVAL;
 	}
-
+	if (_IOC_DIR(cmd) == _IOC_NONE) {
+		pr_err("Invalid ioctl/subdev cmd %u", cmd);
+		return -EINVAL;
+	}
 	mutex_lock(&cpp_dev->mutex);
 	CPP_DBG("E cmd: %d\n", cmd);
 	switch (cmd) {
