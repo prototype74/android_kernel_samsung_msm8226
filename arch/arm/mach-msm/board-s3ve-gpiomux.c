@@ -233,7 +233,7 @@ static struct msm_gpiomux_config msm_sensors_configs[] __initdata = {
 		},
 	},
 };
-
+#ifdef CONFIG_NFC_PN547
 /* NFC configurations */
 static struct gpiomux_setting nfc_gpio_i2c_config = {
 	.func = GPIOMUX_FUNC_3,
@@ -286,7 +286,7 @@ static struct msm_gpiomux_config msm_nfc_configs[] __initdata = {
 		},
 	},
 };
-
+#endif
 /* Hall interrupt configuration */
 static struct gpiomux_setting hall_active_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
@@ -413,6 +413,7 @@ static struct msm_gpiomux_config msm_blsp_configs[] __initdata = {
 			[GPIOMUX_SUSPENDED] = &gpio_uart_sleep_config,
 		},
 	},
+#ifdef CONFIG_NFC_PN547
 	{	/*  NFC   */
 		.gpio      = 10,		/* BLSP1 QUP3 I2C_DAT */
 		.settings = {
@@ -425,6 +426,7 @@ static struct msm_gpiomux_config msm_blsp_configs[] __initdata = {
 			[GPIOMUX_SUSPENDED] = &nfc_gpio_i2c_config,
 		},
 	},
+#endif
 	{
 		.gpio      = 6,			/* BLSP1 QUP2 I2C_SDA */
 		.settings = {
@@ -1025,11 +1027,11 @@ void __init msm8226_init_gpiomux(void)
 	/* Touch Key */
 	msm_gpiomux_install(msm_keyboad_cypress_configs,
 		ARRAY_SIZE(msm_keyboad_cypress_configs));
-
+#ifdef CONFIG_NFC_PN547
 	/* NFC */
 	msm_gpiomux_install(msm_nfc_configs,
 		ARRAY_SIZE(msm_nfc_configs));
-
+#endif
 	/* Sensors */
 	msm_gpiomux_install(msm_sensors_configs,
 		ARRAY_SIZE(msm_sensors_configs));
