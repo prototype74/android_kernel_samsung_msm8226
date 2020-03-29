@@ -3536,9 +3536,16 @@ config MSM_CPU_FREQ_MIN
 
 endif # CPU_FREQ_MSM
 
+config MSM8226_USE_ACPU_FREQ_TBL_1P4
+	bool "Extra CPU Frequencies"
+	default n
+	help
+	  Force using acpu_freq_tbl_8226_1p4 to unlock extra CPU Frequencies
+	  for devices with MSM8226 CPU by setting speed bin to 2.
+
 config MSM8228_USE_ACPU_FREQ_TBL_1P6
 	bool "Extra CPU Frequencies"
-	depends on SEC_ATLANTIC_PROJECT || SEC_S3VE_PROJECT
+	depends on (SEC_ATLANTIC_PROJECT || SEC_S3VE_PROJECT) && !MSM8226_USE_ACPU_FREQ_TBL_1P4
 	default n
 	help
 	  Force using acpu_freq_tbl_8226_1p6 to unlock extra CPU Frequencies
