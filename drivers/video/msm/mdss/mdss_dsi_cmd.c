@@ -73,10 +73,10 @@ char *mdss_dsi_buf_init(struct dsi_buf *dp)
 int mdss_dsi_buf_alloc(struct dsi_buf *dp, int size)
 {
 #if defined(CONFIG_MACH_S3VE3G_EUR)
-   	dp->start = dma_alloc_writecombine(NULL, size, &dp->dmap, GFP_KERNEL);
+	dp->start = dma_alloc_writecombine(NULL, size, &dp->dmap, GFP_KERNEL);
 	if (dp->start == NULL) {
-	pr_err("%s:%u\n", __func__, __LINE__);
-	return -ENOMEM;
+		pr_err("%s:%u\n", __func__, __LINE__);
+		return -ENOMEM;
 	}
 
 	dp->end = dp->start + size;
@@ -87,8 +87,8 @@ int mdss_dsi_buf_alloc(struct dsi_buf *dp, int size)
 
 	dp->data = dp->start;
 	dp->len = 0;
-	return size; 
-	
+	dp->read_cnt = 0;
+	return size;
 #else
 	int off;
 
