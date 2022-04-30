@@ -24,11 +24,8 @@
 #include <linux/kthread.h>
 #include <linux/mutex.h>
 #include <linux/freezer.h>
-<<<<<<< HEAD
 #include <linux/usb/otg.h>
-=======
 #include <linux/random.h>
->>>>>>> 76b9be5d7fe... usb: feed USB device information to the /dev/random driver
 
 #include <asm/uaccess.h>
 #include <asm/byteorder.h>

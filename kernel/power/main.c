@@ -969,11 +969,6 @@ power_attr(pm_trace_dev_match);
 
 #endif /* CONFIG_PM_TRACE */
 
-<<<<<<< HEAD
-#ifdef CONFIG_USER_WAKELOCK
-power_attr(wake_lock);
-power_attr(wake_unlock);
-#endif
 #ifdef CONFIG_SEC_DVFS
 DEFINE_MUTEX(dvfs_mutex);
 static unsigned long dvfs_id;
@@ -1184,10 +1179,7 @@ power_attr(cpufreq_max_limit);
 power_attr(cpufreq_min_limit);
 power_attr(cpufreq_table);
 #endif
-static struct attribute *g[] = {
-=======
 static struct attribute * g[] = {
->>>>>>> 3f04bae581c... Revert "PM: Add user-space wake lock api."
 	&state_attr.attr,
 #ifdef CONFIG_PM_TRACE
 	&pm_trace_attr.attr,
