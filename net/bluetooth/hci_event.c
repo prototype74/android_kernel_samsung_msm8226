@@ -1647,8 +1647,7 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
 		if (conn->type == ACL_LINK) {
 			conn->state = BT_CONFIG;
 			hci_conn_hold(conn);
-			if (!conn->out && !hci_conn_ssp_enabled(conn) &&
-			    !hci_find_link_key(hdev, &ev->bdaddr))
+			if (!conn->out && !hci_find_link_key(hdev, &ev->bdaddr))
 				conn->disc_timeout = HCI_PAIRING_TIMEOUT;
 			else
 				conn->disc_timeout = HCI_DISCONN_TIMEOUT;
@@ -3327,8 +3326,6 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
 	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
 	cp.handle = cpu_to_le16(conn->handle);
 	conn->pin_length = ltk->pin_len;
-
-	conn->enc_key_size = ltk->enc_size;
 
 	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
 
