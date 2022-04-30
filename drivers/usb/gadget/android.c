@@ -247,6 +247,7 @@ struct android_dev {
 	char pm_qos[5];
 	struct pm_qos_request pm_qos_req_dma;
 	struct work_struct work;
+	char ffs_aliases[256];
 #if defined(CONFIG_SEC_H_PROJECT)
 	struct delayed_work usb_connection_work;
 	int speaker_check_count;
@@ -270,7 +271,6 @@ struct android_configuration {
 
 	/* A list node inside the struct android_dev.configs list */
 	struct list_head list_item;
-	char ffs_aliases[256];
 };
 
 struct dload_struct __iomem *diag_dload;
