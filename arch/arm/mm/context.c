@@ -54,14 +54,14 @@ void cpu_set_reserved_ttbr0(void)
 	isb();
 }
 #endif
-
+#if 0 /* set_asid */
 static void write_contextidr(u32 contextidr)
 {
 	uncached_logk(LOGK_CTXID, (void *)contextidr);
 	asm("mcr	p15, 0, %0, c13, c0, 1" : : "r" (contextidr));
 	isb();
 }
-
+#endif
 #ifdef CONFIG_PID_IN_CONTEXTIDR
 static u32 read_contextidr(void)
 {
@@ -101,19 +101,6 @@ static int __init contextidr_notifier_init(void)
 	return thread_register_notifier(&contextidr_notifier_block);
 }
 arch_initcall(contextidr_notifier_init);
-
-static void set_asid(unsigned int asid)
-{
-	u32 contextidr = read_contextidr();
-	contextidr &= ASID_MASK;
-	contextidr |= asid & ~ASID_MASK;
-	write_contextidr(contextidr);
-}
-#else
-static void set_asid(unsigned int asid)
-{
-	write_contextidr(asid);
-}
 #endif
 
 /*
