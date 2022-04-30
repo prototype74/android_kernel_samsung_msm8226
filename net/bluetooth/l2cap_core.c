@@ -1079,9 +1079,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
 		for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
 			bh_lock_sock(sk);
 
-			if (conn->hcon->type == LE_LINK) {
+			if (hcon->type == LE_LINK) {
 				u8 sec_level = l2cap_pi(sk)->sec_level;
-				u8 pending_sec = conn->hcon->pending_sec_level;
+				u8 pending_sec = hcon->pending_sec_level;
 
 				if (pending_sec > sec_level)
 					sec_level = pending_sec;
@@ -1102,7 +1102,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
 			bh_unlock_sock(sk);
 		}
 	} else if (conn->hcon->type == LE_LINK) {
-		smp_conn_security(conn, BT_SECURITY_HIGH);
+		smp_conn_security(hcon, BT_SECURITY_HIGH);
 	}
 
 	read_unlock(&l->lock);
