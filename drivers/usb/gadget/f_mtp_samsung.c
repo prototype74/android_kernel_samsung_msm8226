@@ -430,6 +430,7 @@ struct {
 	},
 };
 
+#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 /* Function  : Change config for multi configuration
  * Parameter : int conf_num (config number)
  *             0 - use mtp only without Samsung USB Driver
@@ -463,6 +464,7 @@ static int mtp_set_config_desc(int conf_num)
 	}
 	return 1;
 }
+#endif
 
 /* -------------------------------------------------------------------------
  *	Main Functionalities Start!

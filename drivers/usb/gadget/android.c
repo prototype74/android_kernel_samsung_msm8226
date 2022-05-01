@@ -108,8 +108,8 @@
 #endif
 #ifndef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 #include "f_ncm.c"
-#endif
 #include "f_charger.c"
+#endif
 #ifdef CONFIG_USB_LOCK_SUPPORT_FOR_MDM
 #include <linux/power_supply.h>
 #endif
@@ -1787,6 +1787,7 @@ static struct android_usb_function ccid_function = {
 	.bind_config	= ccid_function_bind_config,
 };
 
+#ifndef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 /* Charger */
 static int charger_function_bind_config(struct android_usb_function *f,
 						struct usb_configuration *c)
@@ -1798,7 +1799,7 @@ static struct android_usb_function charger_function = {
 	.name		= "charging",
 	.bind_config	= charger_function_bind_config,
 };
-
+#endif
 
 static int
 mtp_function_init(struct android_usb_function *f,
@@ -2590,6 +2591,7 @@ static struct android_usb_function *supported_functions[] = {
 	&qdss_function,
 #ifndef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 	&serial_function,
+	&charger_function,
 #endif
 	&ffs_function,
 	&adb_function,
@@ -2612,7 +2614,6 @@ static struct android_usb_function *supported_functions[] = {
 #ifdef CONFIG_SND_PCM
 	&audio_source_function,
 #endif
-	&charger_function,
 	&uasp_function,
 	NULL
 };
