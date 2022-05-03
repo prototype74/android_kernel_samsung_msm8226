@@ -308,6 +308,9 @@ static int ecryptfs_open(struct inode *inode, struct file *file)
 	ssize_t dlp_len = 0;
 	struct knox_dlp_data dlp_data;
 	struct timespec ts;
+#endif
+
+#ifdef CONFIG_SDP
 	struct ecryptfs_mount_crypt_stat *mount_crypt_stat;
 
 	mount_crypt_stat = &ecryptfs_superblock_to_private(
