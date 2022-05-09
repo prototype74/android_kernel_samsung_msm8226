@@ -108,6 +108,14 @@ static int suspend_prepare(void)
 	if (error)
 		goto Finish;
 
+	printk(KERN_INFO "PM: Syncing filesystems ... ");
+	if (intr_sync(NULL)) {
+		printk("canceled.\n");
+		error = -EBUSY;
+		goto Finish;
+	}
+	printk("done.\n");
+
 	error = suspend_freeze_processes();
 	if (!error)
 		return 0;
@@ -285,10 +293,6 @@ static int enter_state(suspend_state_t state)
 
 	if (!mutex_trylock(&pm_mutex))
 		return -EBUSY;
-
-	printk(KERN_INFO "PM: Syncing filesystems ... ");
-	sys_sync();
-	printk("done.\n");
 
 	pm_qos_add_request(&suspend_pm_qos, PM_QOS_CPU_DMA_LATENCY,
                       PM_QOS_DEFAULT_VALUE);

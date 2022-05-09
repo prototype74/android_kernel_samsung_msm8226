@@ -17,6 +17,10 @@ config LOW_ORDER_SEQ_MALLOC
 	 This will cause system performance degradation.
 	 When high-order allocation is requested, change it to vmalloc.
 
+config INTERRUPTIBLE_SYNC
+	bool "Support interruptible sync for Samsung Mobile Device"
+	default y
+
 if BLOCK
 
 source "fs/ext2/Kconfig"
