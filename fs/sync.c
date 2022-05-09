@@ -26,6 +26,7 @@
 #include <linux/workqueue.h>
 #include <linux/suspend.h>
 #include <linux/delay.h>
+#include <linux/version.h>
 
 //#define CONFIG_INTR_SYNC_DEBUG
 
@@ -215,8 +216,12 @@ find_idle:
 
 //			dbg_print("intr_sync: waiting work[%d]\n", work_idx);
 			/* Return 0 if timed out, or positive if completed. */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
 			ret = wait_for_completion_io_timeout(
 					&sync_work->done, HZ/10);
+#else
+			ret = wait_for_completion_timeout(&sync_work->done, HZ/10);
+#endif
 			/* A work that we are waiting for has done. */
 			if ((ret > 0) || (sync_work->version != work_ver))
 				break;
