@@ -72,4 +72,5 @@
 /* Instruct lower device to use last 4-bytes of skb data as FCS */
 #define SO_NOFCS		43
 
+#define SO_SET_DOMAIN_NAME 51
 #endif /* __ASM_GENERIC_SOCKET_H */
