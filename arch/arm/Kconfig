@@ -2295,6 +2295,13 @@ config AUTO_ZRELADDR
 	  0xf8000000. This assumes the zImage being placed in the first 128MB
 	  from start of memory.
 
+config ANDROIDBOOT_REV_LEGACY
+	bool "Use legacy bootloader rev param"
+	def_bool n
+	help
+	  Pre-M bootloader passes "samsung.board_rev" instead of
+	  "androidboot.revision". Say y to use the legacy param.
+
 endmenu
 
 menu "CPU Power Management"

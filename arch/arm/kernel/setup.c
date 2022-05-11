@@ -596,25 +596,22 @@ static int __init early_mem(char *p)
 }
 early_param("mem", early_mem);
 
-/*
- * Pre-M bootloader passes this value
- */
-static int __init msm_hw_rev_setup_legacy(char *p)
-{
-	system_rev = memparse(p, NULL);
-			return 0;
-}
-early_param("samsung.board_rev", msm_hw_rev_setup_legacy);
-
-/*
- * M bootloader (and beyond?) passes this value
- */
 static int __init msm_hw_rev_setup(char *p)
 {
 	system_rev = memparse(p, NULL);
 			return 0;
 }
+#if defined(CONFIG_ANDROIDBOOT_REV_LEGACY)
+/*
+ * Pre-M bootloader passes this value
+ */
+early_param("samsung.board_rev", msm_hw_rev_setup);
+#else
+/*
+ * M bootloader (and beyond?) passes this value
+ */
 early_param("androidboot.revision", msm_hw_rev_setup);
+#endif
 
 static void __init
 setup_ramdisk(int doload, int prompt, int image_start, unsigned int rd_sz)
