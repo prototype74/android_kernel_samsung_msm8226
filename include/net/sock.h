@@ -384,6 +384,7 @@ struct sock {
 	void			*sk_security;
 #endif
 	__u32			sk_mark;
+	kuid_t			sk_uid;
 	u32			sk_classid;
 	struct cg_proto		*sk_cgrp;
     /* START_OF_KNOX_VPN */
@@ -1641,6 +1642,11 @@ static inline void sock_graft(struct sock *sk, struct socket *parent)
 
 extern int sock_i_uid(struct sock *sk);
 extern unsigned long sock_i_ino(struct sock *sk);
+
+static inline kuid_t sock_net_uid(const struct net *net, const struct sock *sk)
+{
+	return sk ? sk->sk_uid : make_kuid(net->user_ns, 0);
+}
 
 static inline struct dst_entry *
 __sk_dst_get(struct sock *sk)
