@@ -1384,47 +1384,6 @@ static int shmem_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	return ret;
 }
 
-int vmtruncate_range(struct inode *inode, loff_t lstart, loff_t lend)
-{
-	/*
-	 * If the underlying filesystem is not going to provide
-	 * a way to truncate a range of blocks (punch a hole) -
-	 * we should return failure right now.
-	 * Only CONFIG_SHMEM shmem.c ever supported i_op->truncate_range().
-	 */
-	if (inode->i_op->truncate_range != shmem_truncate_range)
-		return -ENOSYS;
-
-	mutex_lock(&inode->i_mutex);
-	{
-		struct shmem_falloc shmem_falloc;
-		struct address_space *mapping = inode->i_mapping;
-		loff_t unmap_start = round_up(lstart, PAGE_SIZE);
-		loff_t unmap_end = round_down(1 + lend, PAGE_SIZE) - 1;
-		DECLARE_WAIT_QUEUE_HEAD_ONSTACK(shmem_falloc_waitq);
-
-		shmem_falloc.waitq = &shmem_falloc_waitq;
-		shmem_falloc.start = unmap_start >> PAGE_SHIFT;
-		shmem_falloc.next = (unmap_end + 1) >> PAGE_SHIFT;
-		spin_lock(&inode->i_lock);
-		inode->i_private = &shmem_falloc;
-		spin_unlock(&inode->i_lock);
-
-		if ((u64)unmap_end > (u64)unmap_start)
-			unmap_mapping_range(mapping, unmap_start,
-					    1 + unmap_end - unmap_start, 0);
-		shmem_truncate_range(inode, lstart, lend);
-		/* No need to unmap again: hole-punching leaves COWed pages */
-
-		spin_lock(&inode->i_lock);
-		inode->i_private = NULL;
-		wake_up_all(&shmem_falloc_waitq);
-		spin_unlock(&inode->i_lock);
-	}
-	mutex_unlock(&inode->i_mutex);
-	return 0;
-}
-
 #ifdef CONFIG_NUMA
 static int shmem_set_policy(struct vm_area_struct *vma, struct mempolicy *mpol)
 {
@@ -3005,11 +2964,6 @@ void shmem_truncate_range(struct inode *inode, loff_t lstart, loff_t lend)
 }
 EXPORT_SYMBOL_GPL(shmem_truncate_range);
 
-int vmtruncate_range(struct inode *inode, loff_t lstart, loff_t lend)
-{
-	/* Only CONFIG_SHMEM shmem.c ever supported i_op->truncate_range(). */
-	return -ENOSYS;
-}
 
 #define shmem_vm_ops				generic_file_vm_ops
 #define shmem_file_operations			ramfs_file_operations
