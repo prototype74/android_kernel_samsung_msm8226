@@ -1356,9 +1356,9 @@ static void fanout_release(struct sock *sk)
 	if (!f)
 		return;
 
+	mutex_lock(&fanout_mutex);
 	po->fanout = NULL;
 
-	mutex_lock(&fanout_mutex);
 	if (atomic_dec_and_test(&f->sk_ref)) {
 		list_del(&f->list);
 		dev_remove_pack(&f->prot_hook);
