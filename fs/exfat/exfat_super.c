@@ -284,43 +284,6 @@ static inline unsigned long exfat_hash(loff_t i_pos);
 static int exfat_write_inode(struct inode *inode, struct writeback_control *wbc);
 static void exfat_write_super(struct super_block *sb);
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,5,0)
-
-#define GLOBAL_ROOT_UID (0)
-#define GLOBAL_ROOT_GID (0)
-
-static inline bool uid_eq(uid_t left, uid_t right)
-{
-	return left == right;
-}
-
-static inline bool gid_eq(gid_t left, gid_t right)
-{
-	return left == right;
-}
-
-static inline uid_t from_kuid_munged(struct user_namespace *to, uid_t kuid)
-{
-	return kuid;
-}
-
-static inline gid_t from_kgid_munged(struct user_namespace *to, gid_t kgid)
-{
-	return kgid;
-}
-
-static inline uid_t make_kuid(struct user_namespace *from, uid_t uid)
-{
-	return uid;
-}
-
-static inline gid_t make_kgid(struct user_namespace *from, gid_t gid)
-{
-	return gid;
-}
-
-#endif
-
 static void __lock_super(struct super_block *sb)
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
