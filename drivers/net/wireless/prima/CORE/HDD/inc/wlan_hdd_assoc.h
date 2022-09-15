@@ -188,7 +188,11 @@ typedef struct connection_info_s
    struct hdd_conn_flag conn_flag;
 
    /** ht operation info */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0)
    struct ieee80211_ht_operation ht_operation;
+#else
+   struct ieee80211_ht_info ht_operation;
+#endif
 
    /** ht operation info */
    struct ieee80211_vht_operation vht_operation;

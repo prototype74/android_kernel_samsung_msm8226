@@ -14816,7 +14816,11 @@ static ssize_t memdump_read(struct file *file, char __user *buf,
                     size_t count, loff_t *pos)
 {
     int status;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
     hdd_context_t *hdd_ctx = (hdd_context_t *)PDE_DATA(file_inode(file));
+#else
+    hdd_context_t *hdd_ctx = (hdd_context_t *)PDE(file->f_dentry->d_inode)->data;
+#endif
     size_t ret_count;
     loff_t bytes_left;
     ENTER();
