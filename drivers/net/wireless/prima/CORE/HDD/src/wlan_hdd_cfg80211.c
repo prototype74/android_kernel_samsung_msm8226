@@ -4188,10 +4188,8 @@ static int __wlan_hdd_cfg80211_extscan_get_valid_channels(struct wiphy *wiphy,
                                         const void *data, int dataLen)
 {
     hdd_context_t *pHddCtx = wiphy_priv(wiphy);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
     struct net_device *dev = wdev->netdev;
     hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR(dev);
-#endif
     uint32_t chan_list[WNI_CFG_VALID_CHANNEL_LIST_LEN] = {0};
     uint8_t num_channels  = 0;
     uint8_t num_chan_new  = 0;
@@ -4201,10 +4199,7 @@ static int __wlan_hdd_cfg80211_extscan_get_valid_channels(struct wiphy *wiphy,
     tWifiBand wifiBand;
     eHalStatus status;
     struct sk_buff *replySkb;
-    tANI_U8 i;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
-    tANI_U8 j,k;
-#endif
+    tANI_U8 i,j,k;
     int ret,len = 0;
 
     ENTER();
@@ -4262,7 +4257,6 @@ static int __wlan_hdd_cfg80211_extscan_get_valid_channels(struct wiphy *wiphy,
 
     num_channels = VOS_MIN(num_channels, maxChannels);
     num_chan_new = num_channels;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)  // IEEE80211_CHAN_INDOOR_ONLY does not exist in <3.10.x kernels
     /* remove the indoor only channels if iface is SAP */
     if (WLAN_HDD_SOFTAP == pAdapter->device_mode)
     {
@@ -4282,7 +4276,7 @@ static int __wlan_hdd_cfg80211_extscan_get_valid_channels(struct wiphy *wiphy,
                 }
             }
     }
-#endif
+
     hddLog(LOG1, FL("Number of channels: %d"), num_chan_new);
     for (i = 0; i < num_chan_new; i++)
         len += scnprintf(buf + len, sizeof(buf) - len, "%u ", chan_list[i]);
