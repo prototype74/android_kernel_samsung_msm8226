@@ -448,13 +448,15 @@ static void hdd_copy_ht_caps(hdd_station_ctx_t *hdd_sta_ctx,
 }
 
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 9, 0)
+#define IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_MASK			0x0000000C
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+#define IEEE80211_VHT_CAP_RXSTBC_MASK				0x00000700
+#endif
 #define VHT_CAP_MAX_MPDU_LENGTH_MASK		0x00000003
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
 #define VHT_CAP_SUPP_CHAN_WIDTH_MASK_SHIFT		 2
-#endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
 #define VHT_CAP_RXSTBC_MASK_SHIFT			 8
-#endif
 #define VHT_CAP_BEAMFORMEE_STS_SHIFT			13
 #define VHT_CAP_BEAMFORMEE_STS_MASK \
     (0x0000e000 >> VHT_CAP_BEAMFORMEE_STS_SHIFT)
@@ -486,7 +488,6 @@ static void hdd_copy_vht_caps(hdd_station_ctx_t *hdd_sta_ctx,
 
     temp_vht_cap = roam_vht_cap->maxMPDULen & VHT_CAP_MAX_MPDU_LENGTH_MASK;
     hdd_vht_cap->vht_cap_info |= temp_vht_cap;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
     temp_vht_cap = roam_vht_cap->supportedChannelWidthSet &
         (IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_MASK >>
             VHT_CAP_SUPP_CHAN_WIDTH_MASK_SHIFT);
@@ -503,7 +504,6 @@ static void hdd_copy_vht_caps(hdd_station_ctx_t *hdd_sta_ctx,
             hdd_vht_cap->vht_cap_info |=
             temp_vht_cap <<
             IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_160_80PLUS80MHZ;
-#endif
     if (roam_vht_cap->ldpcCodingCap)
         hdd_vht_cap->vht_cap_info |= IEEE80211_VHT_CAP_RXLDPC;
     if (roam_vht_cap->shortGI80MHz)
@@ -512,13 +512,11 @@ static void hdd_copy_vht_caps(hdd_station_ctx_t *hdd_sta_ctx,
         hdd_vht_cap->vht_cap_info |= IEEE80211_VHT_CAP_SHORT_GI_160;
     if (roam_vht_cap->txSTBC)
         hdd_vht_cap->vht_cap_info |= IEEE80211_VHT_CAP_TXSTBC;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
     temp_vht_cap = roam_vht_cap->rxSTBC & (IEEE80211_VHT_CAP_RXSTBC_MASK >>
         VHT_CAP_RXSTBC_MASK_SHIFT);
     if (temp_vht_cap)
         hdd_vht_cap->vht_cap_info |=
             temp_vht_cap << VHT_CAP_RXSTBC_MASK_SHIFT;
-#endif
     if (roam_vht_cap->suBeamFormerCap)
         hdd_vht_cap->vht_cap_info |=
             IEEE80211_VHT_CAP_SU_BEAMFORMER_CAPABLE;

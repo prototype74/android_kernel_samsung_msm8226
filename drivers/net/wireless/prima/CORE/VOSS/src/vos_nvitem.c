@@ -59,6 +59,9 @@
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0))
 #define IEEE80211_CHAN_NO_80MHZ		1<<7
 #endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+#define IEEE80211_CHAN_INDOOR_ONLY		1<<9
+#endif
 
 #ifdef CONFIG_ENABLE_LINUX_REG
 
@@ -3687,19 +3690,13 @@ int vos_update_nv_table_from_wiphy_band(void *hdd_ctx,
             }
             /* nv cannot distinguish between DFS and passive channels */
             else if (wiphy->bands[i]->channels[j].flags &
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
                     (IEEE80211_CHAN_RADAR | IEEE80211_CHAN_PASSIVE_SCAN |
                      IEEE80211_CHAN_INDOOR_ONLY))
-#else
-                    (IEEE80211_CHAN_RADAR | IEEE80211_CHAN_PASSIVE_SCAN))
-#endif
             {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
                 if (wiphy->bands[i]->channels[j].flags &
                         IEEE80211_CHAN_INDOOR_ONLY)
                     wiphy->bands[i]->channels[j].flags |=
                         IEEE80211_CHAN_PASSIVE_SCAN;
-#endif
 #ifdef FEATURE_WLAN_CH144
                 if ((RF_CHAN_144 == k) && (E_NV_V3 != vos_nv_getNvVersion()))
                 {
