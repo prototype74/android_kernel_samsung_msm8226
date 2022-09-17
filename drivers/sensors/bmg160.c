@@ -449,7 +449,7 @@ static void bmg160_work_func(struct work_struct *work)
 	struct timespec ts;
 	int time_hi, time_lo;
 
-	ts = ktime_to_timespec(alarm_get_elapsed_realtime());
+	ts = ktime_to_timespec(ktime_get_boottime());
 	data->timestamp = ts.tv_sec * 1000000000ULL + ts.tv_nsec;
 
 	time_hi = (int)((data->timestamp & TIME_HI_MASK) >> TIME_HI_SHIFT);

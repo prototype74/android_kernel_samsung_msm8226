@@ -205,8 +205,7 @@ static void hscd_poll(struct alps_data *data)
 	int xyz[3];
 	struct input_dev * idev = data->alps_idev->input;
 	int time_hi, time_lo;
-	struct timespec ts;
-    get_monotonic_boottime(&ts);
+	struct timespec ts = ktime_to_timespec(ktime_get_boottime());
 	u64 timestamp_new = ts.tv_sec * 1000000000ULL + ts.tv_nsec;
 	u64 delay = data->delay * 1000000ULL;
 	u64 shift_timestamp = delay >> 1;

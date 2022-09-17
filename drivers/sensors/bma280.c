@@ -441,7 +441,7 @@ static void bma280_work_func(struct work_struct *work)
 	struct bma280_v acc;
 	struct bma280_p *data = container_of(work, struct bma280_p, work);
 
-	struct timespec ts = ktime_to_timespec(alarm_get_elapsed_realtime());
+	struct timespec ts = ktime_to_timespec(ktime_get_boottime());
 	u64 timestamp_new = ts.tv_sec * 1000000000ULL + ts.tv_nsec;
 	int time_hi, time_lo;
 	//u64 diff = 0ULL;
