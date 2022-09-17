@@ -2072,7 +2072,11 @@ static int get_fuelgauge_soc(struct i2c_client *client)
 			goto return_soc;
 		}
 
+#if defined(ANDROID_ALARM_ACTIVATED)
 	current_time = alarm_get_elapsed_realtime();
+#else
+	current_time = ktime_get_boottime();
+#endif
 	ts = ktime_to_timespec(current_time);
 
 	/* check fullcap range */
@@ -2218,7 +2222,11 @@ bool sec_hal_fg_init(struct i2c_client *client)
 	ktime_t	current_time;
 	struct timespec ts;
 
+#if defined(ANDROID_ALARM_ACTIVATED)
 	current_time = alarm_get_elapsed_realtime();
+#else
+	current_time = ktime_get_boottime();
+#endif
 	ts = ktime_to_timespec(current_time);
 
 	board_fuelgauge_init(fuelgauge);
