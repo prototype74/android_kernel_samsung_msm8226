@@ -238,7 +238,7 @@
 /* FW RAM parameters */
 #define CY_RAM_ID_TOUCHMODE_ENABLED	0xD0 /* Enable proximity */
 
-#ifdef CONFIG_SEC_DVFS
+#if defined(CONFIG_SEC_DVFS) || defined(CONFIG_CPU_FREQ_LIMIT_USERSPACE)
 #define TSP_BOOSTER
 #else
 #undef TSP_BOOSTER
