@@ -142,7 +142,7 @@
 			cypress,scl-gpio = <&msmgpio 66 0x00>;
 			cypress,sda-gpio = <&msmgpio 114 0x00>;
 			cypress,irq-gpio = <&msmgpio 49 0x1>;
-			cypress,tkey-keycodes = <158 139>;
+			cypress,tkey-keycodes = <158 254>;
 			cypress,i2c-pull-up = <1>;
 		};
 	};
