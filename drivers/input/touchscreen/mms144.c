@@ -3298,7 +3298,7 @@ static struct device w1_dev = {
 static ssize_t w1_show(struct device *dev,
 		struct device_attribute *devattr, char *buf)
 {
-	return snprintf(buf, 5, "1\n");
+	return snprintf(buf, 5, "0\n");
 }
 
 static DEVICE_ATTR(w1_master_check_id, S_IRUGO, w1_show, NULL);
