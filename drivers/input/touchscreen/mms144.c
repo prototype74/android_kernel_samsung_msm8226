@@ -3529,6 +3529,14 @@ static int __devexit mms_ts_remove(struct i2c_client *client)
 	return 0;
 }
 
+static void mms_ts_shutdown(struct i2c_client *client)
+{
+	struct mms_ts_info *info = i2c_get_clientdata(client);
+
+	if (info->enabled)
+		melfas_vdd_on(info, 0);
+}
+
 #if defined(CONFIG_PM) || defined(CONFIG_HAS_EARLYSUSPEND) || defined(USE_OPEN_CLOSE)
 static int mms_ts_suspend(struct device *dev)
 {
@@ -3644,6 +3652,7 @@ static struct of_device_id mms_match_table[] = {
 static struct i2c_driver mms_ts_driver = {
 	.probe		= mms_ts_probe,
 	.remove		= __devexit_p(mms_ts_remove),
+	.shutdown	= mms_ts_shutdown,
 	.driver = {
 		   .name = MELFAS_TS_NAME,
 #ifdef CONFIG_OF
