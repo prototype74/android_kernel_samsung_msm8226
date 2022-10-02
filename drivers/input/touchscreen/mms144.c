@@ -59,8 +59,6 @@
 #define MAX_FINGERS		10
 #define MAX_WIDTH		30
 #define MAX_PRESSURE		255
-#define MAX_ANGLE		90
-#define MIN_ANGLE		-90
 
 /* Registers */
 #define MMS_MODE_CONTROL	0x01
@@ -845,7 +843,6 @@ static irqreturn_t mms_ts_interrupt(int irq, void *dev_id)
 #endif
 		input_report_abs(info->input_dev, ABS_MT_TOUCH_MAJOR, tmp[6]);
 		input_report_abs(info->input_dev, ABS_MT_TOUCH_MINOR, tmp[7]);
-		input_report_abs(info->input_dev, ABS_MT_ANGLE, angle);
 		input_report_abs(info->input_dev, ABS_MT_PALM, palm);
 #if defined(SEC_TSP_DEBUG)
 		if (info->finger_state[id] == 0) {
@@ -3417,8 +3414,6 @@ int __devinit mms_ts_probe(struct i2c_client *client,
 				0, MAX_PRESSURE, 0, 0);
 	input_set_abs_params(info->input_dev, ABS_MT_TOUCH_MINOR,
 				0, MAX_PRESSURE, 0, 0);
-	input_set_abs_params(input_dev, ABS_MT_ANGLE,
-				MIN_ANGLE, MAX_ANGLE, 0, 0);
 	input_set_abs_params(input_dev, ABS_MT_PALM,
 				0, 1, 0, 0);
 	input_set_drvdata(input_dev, info);
