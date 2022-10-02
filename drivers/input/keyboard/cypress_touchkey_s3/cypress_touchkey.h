@@ -14,6 +14,10 @@
 extern struct class *sec_class;
 extern int ISSP_main(void);
 
+#ifdef CONFIG_SAMSUNG_LPM_MODE
+extern int poweroff_charging;
+#endif
+
 /* DVFS feature : TOUCH BOOSTER */
 #define TSP_BOOSTER
 #ifdef TSP_BOOSTER

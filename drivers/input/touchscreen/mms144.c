@@ -3663,10 +3663,12 @@ static struct i2c_driver mms_ts_driver = {
 
 static int __init mms_ts_init(void)
 {
+#ifdef CONFIG_SAMSUNG_LPM_MODE
 	if (poweroff_charging) {
 		pr_info("%s : LPM Charging Mode!!\n", __func__);
 		return 0;
 	}
+#endif
 	return i2c_add_driver(&mms_ts_driver);
 }
 

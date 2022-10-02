@@ -51,7 +51,9 @@ struct mms_ts_platform_data {
 	int	check_module_type;
 };
 extern struct class *sec_class;
+#ifdef CONFIG_SAMSUNG_LPM_MODE
 extern int poweroff_charging;
+#endif
 extern unsigned char LCD_Get_Value(void);
 
 //extern struct tsp_callbacks {

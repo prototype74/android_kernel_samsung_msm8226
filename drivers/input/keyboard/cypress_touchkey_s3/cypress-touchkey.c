@@ -1569,19 +1569,26 @@ struct i2c_driver cypress_touchkey_driver = {
 		   },
 	.id_table = cypress_touchkey_id,
 };
-
-
+/*
 module_i2c_driver(cypress_touchkey_driver);
-
-/*t cypress_touchkey_init(void)
+*/
+static int __init cypress_touchkey_init(void)
 {
 	int ret = 0;
 
+#ifdef CONFIG_SAMSUNG_LPM_MODE
+	if (poweroff_charging) {
+		pr_notice("%s : LPM Charging Mode!!\n", __func__);
+		return ret;
+	}
+#endif
+
 	ret = i2c_add_driver(&cypress_touchkey_driver);
 	if (ret) {
-		pr_err("[TouchKey] cypress touch keypad registration failed. ret= %d\n",
+		printk(KERN_ERR "[TouchKey] cypress touch keypad registration failed. ret= %d\n",
 			ret);
 	}
+	printk(KERN_ERR "%s: init done %d\n", __func__, ret);
 
 	return ret;
 }
@@ -1591,8 +1598,8 @@ static void __exit cypress_touchkey_exit(void)
 	i2c_del_driver(&cypress_touchkey_driver);
 }
 
-late_initcall(cypress_touchkey_init);
+module_init(cypress_touchkey_init);
 module_exit(cypress_touchkey_exit);
-*/
+
 MODULE_DESCRIPTION("Touchkey driver for Cypress touchkey controller ");
 MODULE_LICENSE("GPL");
