@@ -147,6 +147,9 @@ struct cypress_touchkey_info {
 
 };
 
+#if defined(CONFIG_KEYBOARD_CYPRESS_TOUCHKEY_S3)
+extern void cypress_power_onoff(struct cypress_touchkey_info *info, int onoff);
+#endif
 void touchkey_charger_infom(bool en);
 
 

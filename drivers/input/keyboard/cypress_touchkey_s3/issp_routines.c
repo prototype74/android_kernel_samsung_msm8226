@@ -345,7 +345,7 @@ signed char fXRESInitializeTargetForISSP(void)
  ============================================================================
 
 */
-signed char fPowerCycleInitializeTargetForISSP(void)
+signed char fPowerCycleInitializeTargetForISSP(struct cypress_touchkey_info *info)
 {
 	unsigned char n;
 
@@ -360,7 +360,7 @@ signed char fPowerCycleInitializeTargetForISSP(void)
 	SetTargetVDDStrong();
 		for (n = 0; n < 200; n++)
 			Delay(50000);
-	ApplyTargetVDD();
+	ApplyTargetVDD(info);
 	 /* wait 1msec for the power to stabilize */
 
 	for (n = 0; n < 10; n++)
@@ -763,7 +763,7 @@ signed char fAccTargetBankChecksum(unsigned int *pAcc)
  ============================================================================
 */
 
-void ReStartTarget(void)
+void ReStartTarget(struct cypress_touchkey_info *info)
 {
 #ifdef RESET_MODE
 	/* Assert XRES, then release, then disable XRES-Enable */
@@ -778,10 +778,10 @@ void ReStartTarget(void)
 	SetSCLKHiZ();
 	SetSDATAHiZ();
 	/* Cycle power on the target to cause a reset */
-	RemoveTargetVDD();
+	RemoveTargetVDD(info);
 		for (i = 0; i < 100; i++)
 			Delay(50000);
-	ApplyTargetVDD();
+	ApplyTargetVDD(info);
 #endif
 }
 

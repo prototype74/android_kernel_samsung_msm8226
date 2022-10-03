@@ -1,5 +1,7 @@
 /* filename: ISSP_Extern.h */
 #include "issp_revision.h"
+#include <linux/i2c/cypress_touchkey.h>
+
 #ifdef PROJECT_REV_304
 /*
 * Copyright 2006-2007, Cypress Semiconductor Corporation.
@@ -26,13 +28,13 @@
 #include "issp_directives.h"
 #include "issp_defs.h"
 
-extern int ISSP_main(void);
+extern int ISSP_main(struct cypress_touchkey_info *info);
 
 extern signed char fXRESInitializeTargetForISSP(void);
-extern signed char fPowerCycleInitializeTargetForISSP(void);
+extern signed char fPowerCycleInitializeTargetForISSP(struct cypress_touchkey_info *info);
 extern signed char fEraseTarget(void);
 extern unsigned int iLoadTarget(void);
-extern void ReStartTarget(void);
+extern void ReStartTarget(struct cypress_touchkey_info *info);
 extern signed char fVerifySiliconID(void);
 extern signed char fAccTargetBankChecksum(unsigned int *);
 extern void SetBankNumber(unsigned char);
@@ -75,8 +77,8 @@ extern void SetSDATAStrong(void);
 extern void AssertXRES(void);
 extern void DeassertXRES(void);
 extern void SetXRESStrong(void);
-extern void ApplyTargetVDD(void);
-extern void RemoveTargetVDD(void);
+extern void ApplyTargetVDD(struct cypress_touchkey_info *info);
+extern void RemoveTargetVDD(struct cypress_touchkey_info *info);
 extern void SetTargetVDDStrong(void);
 
 

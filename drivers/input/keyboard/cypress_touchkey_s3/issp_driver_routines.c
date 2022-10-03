@@ -405,79 +405,11 @@ void SetTargetVDDStrong(void)
  Provide power to the target PSoC's Vdd pin through a GPIO.
  ****************************************************************************
 */
-
-static void cypress_power_onoff(int onoff)
-{
-//	if (machine_is_GOGH()) {
-//		if (onoff)
-//			gpio_direction_output(51, 1);
-//		else
-//			gpio_direction_output(51, 0);
-//	} else {
-		int ret, rc;
-		static struct regulator *reg_l29, *reg_l10;
-
-		if (!reg_l29) {
-			reg_l29 = regulator_get(NULL, "8921_l29");
-					ret = regulator_set_voltage(reg_l29,
-					1800000, 1800000);
-
-			if (IS_ERR(reg_l29)) {
-				pr_err("could not get 8921_l29, rc = %ld\n",
-					PTR_ERR(reg_l29));
-				return;
-			}
-		}
-
-		if (!reg_l10) {
-			reg_l10 = regulator_get(NULL, "8921_l10");
-				ret = regulator_set_voltage(reg_l10,
-				3000000, 3000000);
-			if (IS_ERR(reg_l10)) {
-				pr_err("could not get 8921_l10, rc = %ld\n",
-					PTR_ERR(reg_l10));
-				return;
-			}
-		}
-
-
-		if (onoff) {
-			ret = regulator_enable(reg_l29);
-
-			rc =  regulator_enable(reg_l10);
-
-			if (ret) {
-				pr_err("enable l29 failed, rc=%d\n", ret);
-				return;
-			}
-
-			if (rc) {
-					pr_err("enable l10 failed, rc=%d\n",
-									rc);
-				return;
-			}
-			pr_info("cypress_power_on is finished.\n");
-		} else {
-			ret = regulator_disable(reg_l29);
-			rc =  regulator_disable(reg_l10);
-			if (ret) {
-				pr_err("disable l29 failed, rc=%d\n", ret);
-				return;
-			}
-			if (rc) {
-				pr_err("enable l10 failed, rc=%d\n", rc);
-				return;
-			}
-			pr_info("cypress_power_off is finished.\n");
-		}
-//	}
-}
-
-void ApplyTargetVDD(void)
+void ApplyTargetVDD(struct cypress_touchkey_info *info)
 {
 	gpio_direction_input(GPIO_TOUCHKEY_SDA);
 	gpio_direction_input(GPIO_TOUCHKEY_SCL);
-	cypress_power_onoff(1);
+	cypress_power_onoff(info, 1);
 }
 
 /*
@@ -491,9 +423,9 @@ void ApplyTargetVDD(void)
  Remove power from the target PSoC's Vdd pin.
  ****************************************************************************
 */
-void RemoveTargetVDD(void)
+void RemoveTargetVDD(struct cypress_touchkey_info *info)
 {
-	cypress_power_onoff(0);
+	cypress_power_onoff(info, 0);
 }
 #endif
 

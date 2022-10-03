@@ -226,7 +226,7 @@ void TX8SW_PutHexWord(unsigned int ch)
  function -- such as reporting over a communcations port.
  =========================================================================
 */
-void ErrorTrap(unsigned char bErrorNumber)
+void ErrorTrap(struct cypress_touchkey_info *info, unsigned char bErrorNumber)
 {
     #ifndef RESET_MODE
 	/*
@@ -236,7 +236,7 @@ void ErrorTrap(unsigned char bErrorNumber)
 	SetSCLKHiZ();
 	SetSDATAHiZ();
 	 /* If Power Cycle programming, turn off the target */
-	RemoveTargetVDD();
+	RemoveTargetVDD(info);
     #endif
 
 	#ifdef TX_ON
@@ -257,19 +257,19 @@ void ErrorTrap(unsigned char bErrorNumber)
 /* Based on the diagram in the AN2026                                        */
 /* ========================================================================= */
 
-int ISSP_main(void)
+int ISSP_main(struct cypress_touchkey_info *info)
 {
     /*
      -- This example section of commands show the high-level calls to -------
      -- perform Target Initialization, SilcionID Test, Bulk-Erase, Target ---
      -- RAM Load, FLASH-Block Program, and Target Checksum Verification. ----
     */
-		pr_err("[TKEY] start..\n");
+	pr_err("[TKEY] start..\n");
 
 	SetSCLKHiZ();
 	SetSDATAHiZ();
 	/* Cycle power on the target to cause a reset */
-	RemoveTargetVDD();
+	RemoveTargetVDD(info);
 
 	#ifdef TX_ON
 		TX8SW_Start();
@@ -287,13 +287,13 @@ Acquire the device through reset or power cycle
 	 /* Initialize the Host & Target for ISSP operations */
 	fIsError = fXRESInitializeTargetForISSP();
 	if (fIsError != 0)
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 #else
 	 /* Initialize the Host & Target for ISSP operations */
-	fIsError = fPowerCycleInitializeTargetForISSP();
+	fIsError = fPowerCycleInitializeTargetForISSP(info);
 
 	if (fIsError != 0)
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 #endif
 /*#if 0
 Run the SiliconID Verification, and proceed according to result.
@@ -310,7 +310,7 @@ Run the SiliconID Verification, and proceed according to result.
 
 	fIsError = fEraseTarget();
 	if (fIsError != 0)
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 
 	#ifdef TX_ON
 		TX8SW_PutCRLF();
@@ -340,13 +340,13 @@ Run the SiliconID Verification, and proceed according to result.
 			#ifdef CY8C20x66
 			fIsError = fSyncEnable();
 			if (fIsError) {
-				ErrorTrap(fIsError);
+				ErrorTrap(info, fIsError);
 				return fIsError;
 			}
 			fIsError = fReadWriteSetup();
 			if (fIsError) {
 				/*send write command - swanhan*/
-				ErrorTrap(fIsError);
+				ErrorTrap(info, fIsError);
 				return fIsError;
 			}
 			#endif
@@ -360,7 +360,7 @@ Run the SiliconID Verification, and proceed according to result.
 	fIsError = fProgramTargetBlock(bBankCounter,
 			(unsigned char)iBlockCounter);
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 		}
 #ifdef CY8C20x66 /*PTJ: READ-STATUS after PROGRAM-AND-VERIFY*/
@@ -370,7 +370,7 @@ Run the SiliconID Verification, and proceed according to result.
 #endif
 		fIsError = fReadStatus();
 		if (fIsError) {
-			ErrorTrap(fIsError);
+			ErrorTrap(info, fIsError);
 			return fIsError;
 		}
 #endif
@@ -389,25 +389,25 @@ a stand-alone verify at a later date.
 #ifdef CY8C20x66
 	fIsError = fSyncEnable();
 	if (fIsError) {/*PTJ: 307, added for tsync enable testing.*/
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
 	fIsError = fReadWriteSetup();
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
 #endif
 	/*Load one bank of security data from hex file into buffer*/
 	fIsError = fLoadSecurityData(bBankCounter);
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
 	/*Secure one bank of the target flash*/
 	fIsError = fSecureTargetFlash();
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
 	}
@@ -418,14 +418,14 @@ a stand-alone verify at a later date.
 */
 	fIsError = fLoadSecurityData(bBankCounter);
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
 
     #ifdef CY8C20x66
 	fIsError = fReadSecurity();
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
     #endif
@@ -437,7 +437,7 @@ a stand-alone verify at a later date.
 for (bBankCounter = 0; bBankCounter < NUM_BANKS; bBankCounter++) {
 	fIsError = fAccTargetBankChecksum(&iChecksumTarget);
 	if (fIsError) {
-		ErrorTrap(fIsError);
+		ErrorTrap(info, fIsError);
 		return fIsError;
 	}
 }
@@ -446,7 +446,7 @@ pr_err("Checksum : iChecksumData (0x%X)\n", (unsigned char)iChecksumData);
 
 if ((unsigned short)(iChecksumTarget&0xffff) !=
 	(unsigned short) (iChecksumData & 0xffff)) {
-	ErrorTrap(VERIFY_ERROR);
+	ErrorTrap(info, VERIFY_ERROR);
 	return fIsError;
 }
 
@@ -455,7 +455,7 @@ if ((unsigned short)(iChecksumTarget&0xffff) !=
     // Bulk-Erased, Block-Loaded, Block-Programmed, Block-Verified, and Device-
     // Checksum Verified.
     // You may want to restart Your Target PSoC Here.*/
-	ReStartTarget();
+	ReStartTarget(info);
 	return 0;
 }
 #endif  /* (PROJECT_REV_) */

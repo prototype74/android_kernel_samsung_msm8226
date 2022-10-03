@@ -536,7 +536,7 @@ static ssize_t touch_update_write(struct device *dev,
 	disable_irq(info->irq);
 
 	while (retry--) {
-		if (ISSP_main() == 0) {
+		if (ISSP_main(info) == 0) {
 			dev_err(&info->client->dev,
 				"[TOUCHKEY] Update success!\n");
 			msleep(50);
@@ -1242,7 +1242,7 @@ printk("[TKEY] %s _ %d\n",__func__,__LINE__);
 		disable_irq(client->irq);
 
 		while (retry--) {
-			if (ISSP_main() == 0) {
+			if (ISSP_main(info) == 0) {
 				dev_err(&client->dev, "[TOUCHKEY] Update success!\n");
 				enable_irq(client->irq);
 				break;
