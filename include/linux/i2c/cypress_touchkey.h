@@ -12,7 +12,12 @@
 #ifndef __LINUX_CYPRESS_TOUCHKEY_H
 #define __LINUX_CYPRESS_TOUCHKEY_H
 extern struct class *sec_class;
-/* extern int ISSP_main(void); */
+
+#if defined(CONFIG_KEYBOARD_CYPRESS_TOUCHKEY_S3)
+#ifdef CONFIG_SAMSUNG_LPM_MODE
+extern int poweroff_charging;
+#endif
+#endif
 
 /* DVFS feature : TOUCH BOOSTER */
 #define TSP_BOOSTER
@@ -29,9 +34,11 @@ extern struct class *sec_class;
 #include <linux/earlysuspend.h>
 #include <linux/mutex.h>
 
+#if defined(KEYBOARD_CYPRESS_TOUCHKEY_KS01)
 #define CONFIG_GLOVE_TOUCH
 #if defined(CONFIG_GLOVE_TOUCH)
 #define TK_BIT_GLOVE 0x40
+#endif
 #endif
 
 //#define AUTOCAL_WORKQUEUE
@@ -51,10 +58,12 @@ extern struct class *sec_class;
 #define CYPRESS_55_IC_MASK	0x20
 #define CYPRESS_65_IC_MASK	0x04
 
+#if defined(KEYBOARD_CYPRESS_TOUCHKEY_KS01)
 #define CYPRESS_DETECTION_FLAG		0x1B
 #define TK_CMD_INTERRUPT_SET_REG	0x18
 #define TK_CMD_DUAL_DETECTION		0x01
 #define TK_BIT_DETECTION_CONFIRM	0xEE
+#endif
 #define NUM_OF_KEY		4
 
 #ifdef TK_INFORM_CHARGER
@@ -79,6 +88,9 @@ struct cypress_touchkey_platform_data {
 	int gpio_scl;
 	u32 scl_gpio_flags;
 	int vdd_led;
+#if defined(CONFIG_KEYBOARD_CYPRESS_TOUCHKEY_S3)
+	int vdd_en;
+#endif
 };
 
 struct cypress_touchkey_info {

@@ -24,7 +24,7 @@
 #include <linux/gpio.h>
 #include <linux/miscdevice.h>
 #include <linux/earlysuspend.h>
-#include "cypress_tkey_fw.h"
+#include <linux/i2c/cypress_touchkey.h>
 #include <linux/regulator/consumer.h>
 #include <linux/mutex.h>
 #include <linux/workqueue.h>
@@ -32,7 +32,8 @@
 #include <asm/mach-types.h>
 
 #include <linux/of_gpio.h>
-#include "cypress_touchkey.h"
+#include "cypress_tkey_fw.h"
+#include "issp_extern.h"
 
 #if defined(CONFIG_LCD_CONNECTION_CHECK)
 extern int is_lcd_attached(void);

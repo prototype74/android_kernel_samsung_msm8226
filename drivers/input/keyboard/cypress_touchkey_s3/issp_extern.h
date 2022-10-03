@@ -26,6 +26,8 @@
 #include "issp_directives.h"
 #include "issp_defs.h"
 
+extern int ISSP_main(void);
+
 extern signed char fXRESInitializeTargetForISSP(void);
 extern signed char fPowerCycleInitializeTargetForISSP(void);
 extern signed char fEraseTarget(void);
