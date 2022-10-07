@@ -76,7 +76,6 @@ extern int is_lcd_attached(void);
 #define CYPRESS_LED_CONTROL_ON	0X60
 #define CYPRESS_LED_CONTROL_OFF	0X70
 #define CYPRESS_SLEEP		0X80
-static int vol_mv_level = 33;
 
 #define USE_OPEN_CLOSE
 
@@ -248,51 +247,6 @@ error_reg_opt_i2c:
 		regulator_put(info->vdd_led);
 error_get_vtg_i2c:
 	return;
-}
-
-
-static void change_touch_key_led_voltage(int vol_mv)
-{
-	struct regulator *tled_regulator;
-	int ret;
-	vol_mv_level = vol_mv;
-
-	tled_regulator = regulator_get(NULL, "8921_l10");
-	if (IS_ERR(tled_regulator)) {
-		pr_err("%s: failed to get resource %s\n", __func__,
-			"touch_led");
-		return;
-	}
-	ret = regulator_set_voltage(tled_regulator,
-		vol_mv * 100000, vol_mv * 100000);
-	if (ret)
-		printk(KERN_ERR"error setting voltage\n");
-	regulator_put(tled_regulator);
-}
-
-static ssize_t brightness_control(struct device *dev,
-	struct device_attribute *attr, const char *buf, size_t size)
-{
-	int data;
-
-	if (sscanf(buf, "%2d\n", &data) == 1) {
-		printk(KERN_ERR"[TouchKey] touch_led_brightness: %d\n", data);
-		change_touch_key_led_voltage(data);
-	} else {
-		printk(KERN_ERR "[TouchKey] touch_led_brightness Error\n");
-	}
-	return size;
-}
-
-static ssize_t brightness_level_show(struct device *dev,
-	struct device_attribute *attr, char *buf)
-{
-	int count;
-
-	count = sprintf(buf, "%d\n", vol_mv_level);
-
-	printk(KERN_DEBUG "[TouchKey] Touch LED voltage = %d\n", vol_mv_level);
-	return count;
 }
 
 static irqreturn_t cypress_touchkey_interrupt(int irq, void *dev_id)
@@ -945,8 +899,6 @@ static DEVICE_ATTR(autocal_enable, S_IRUGO | S_IWUSR | S_IWGRP, NULL,
 		   autocalibration_enable);
 static DEVICE_ATTR(autocal_stat, S_IRUGO | S_IWUSR | S_IWGRP,
 		   autocalibration_status, NULL);
-static DEVICE_ATTR(touchkey_brightness_level, S_IRUGO | S_IWUSR | S_IWGRP,
-				brightness_level_show, brightness_control);
 
 #ifdef CONFIG_OF
 static void cypress_request_gpio(struct cypress_touchkey_platform_data *pdata)
@@ -1381,12 +1333,6 @@ printk("[TKEY] %s _ %d\n",__func__,__LINE__);
 		goto err_sysfs;
 	}
 
-	if (device_create_file(sec_touchkey,
-		&dev_attr_touchkey_brightness_level) < 0) {
-		printk(KERN_ERR "Failed to create device file(%s)!\n",
-		dev_attr_touchkey_brightness_level.attr.name);
-		goto err_sysfs;
-	}
 	info->is_powering_on = false;
 	return 0;
 
