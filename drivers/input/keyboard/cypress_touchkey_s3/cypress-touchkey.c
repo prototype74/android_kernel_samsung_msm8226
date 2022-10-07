@@ -526,41 +526,11 @@ static ssize_t touch_update_write(struct device *dev,
 {
 	struct cypress_touchkey_info *info = dev_get_drvdata(dev);
 	int count = 0;
-	int retry = NUM_OF_RETRY_UPDATE;
 	char buff[16] = {0};
 	u8 data;
 
-	info->touchkey_update_status = 1;
-	dev_err(dev, "[TOUCHKEY] touch_update_write!\n");
-
-	disable_irq(info->irq);
-
-	while (retry--) {
-		if (ISSP_main(info) == 0) {
-			dev_err(&info->client->dev,
-				"[TOUCHKEY] Update success!\n");
-			msleep(50);
-			cypress_touchkey_auto_cal(info);
-			info->touchkey_update_status = 0;
-			count = 1;
-			enable_irq(info->irq);
-			break;
-		}
-		dev_err(&info->client->dev,
-			"[TOUCHKEY] Touchkey_update failed... retry...\n");
-	}
-
-	if (retry <= 0) {
-		if (info->pdata->gpio_led_en)
-			cypress_touchkey_con_hw(info, false);
-		msleep(300);
-		count = 0;
-		dev_err(&info->client->dev, "[TOUCHKEY]Touchkey_update fail\n");
-		info->touchkey_update_status = -1;
-		return count;
-	}
-
-	msleep(500);
+	info->touchkey_update_status = 0;
+	dev_err(dev, "[TOUCHKEY] touch_update_write: FW update isn't supported!\n");
 
 	data = i2c_smbus_read_byte_data(info->client, CYPRESS_FW_VER);
 	count = snprintf(buff, sizeof(buff), "0x%02x\n", data);
