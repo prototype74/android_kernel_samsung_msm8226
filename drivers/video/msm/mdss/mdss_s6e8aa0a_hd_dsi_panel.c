@@ -2536,6 +2536,10 @@ int mdss_dsi_panel_init(struct device_node *node,
 				"qcom,cont-splash-enabled");
 	else
 		cont_splash_enabled = false;
+#if defined(CONFIG_LCD_CONNECTION_CHECK)
+	if (is_lcd_attached() == 0)
+		cont_splash_enabled = 0;
+#endif
 	if (!cont_splash_enabled) {
 		pr_info("%s:%d Continuous splash flag not found.\n",
 				__func__, __LINE__);
