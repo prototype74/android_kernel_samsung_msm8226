@@ -1595,7 +1595,7 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 end:
 	return;
 }
-int bl_first_update=0;
+
 static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
@@ -1620,14 +1620,9 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 	if (ctrl->on_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
-#if defined(CONFIG_MACH_S3VE3G_EUR)	
-	if(bl_first_update == 0){
-		bl_first_update = 1;
-		pr_err("to maintain default brightness\n");
-	}
-	else
-		mdss_dsi_panel_bl_ctrl(pdata,msd.mfd->bl_previous);
-#endif
+
+	if (msd.mfd->bl_previous)
+		mdss_dsi_panel_bl_ctrl(pdata, msd.mfd->bl_previous);
 
 	panel_state = MIPI_RESUME_STATE;
 #if defined(CONFIG_LCD_CLASS_DEVICE)
