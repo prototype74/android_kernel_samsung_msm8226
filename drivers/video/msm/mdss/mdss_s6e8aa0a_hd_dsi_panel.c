@@ -967,25 +967,30 @@ static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 
 u32 mdss_dsi_cmd_receive(struct mdss_dsi_ctrl_pdata *ctrl, struct dsi_cmd_desc *cmd, int rlen)
 {
-        struct dcs_cmd_req cmdreq;
+	struct dcs_cmd_req cmdreq;
+	char *buf;
 
-        memset(&cmdreq, 0, sizeof(cmdreq));
-        cmdreq.cmds = cmd;
-        cmdreq.cmds_cnt = 1;
-        cmdreq.flags = CMD_REQ_RX | CMD_REQ_COMMIT;
-        cmdreq.rlen = rlen;
-        cmdreq.cb = NULL;
-
-        // This mutex is to sync up with dynamic FPS changes
-    	// so that DSI lockups shall not happen
-
-    	BUG_ON(msd.ctrl_pdata == NULL);
-//    	mutex_lock(&msd.ctrl_pdata->dfps_mutex);
-        mdss_dsi_cmdlist_put(ctrl, &cmdreq);
-//      mutex_unlock(&msd.ctrl_pdata->dfps_mutex);
-
-         // blocked here, untill call back called
-        return ctrl->rx_buf.len;
+	buf = kmalloc(sizeof(rlen), GFP_KERNEL);
+	memset(&cmdreq, 0, sizeof(cmdreq));
+	cmdreq.cmds = cmd;
+	cmdreq.cmds_cnt = 1;
+	cmdreq.flags = CMD_REQ_RX | CMD_REQ_COMMIT;
+	cmdreq.rbuf = buf;
+	cmdreq.rlen = rlen;
+	cmdreq.cb = NULL; /* call back */
+	/*
+	 * This mutex is to sync up with dynamic FPS changes
+	 * so that DSI lockups shall not happen
+	 */
+	BUG_ON(msd.ctrl_pdata == NULL);
+	mutex_lock(&msd.ctrl_pdata->dfps_mutex);
+	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
+	mutex_unlock(&msd.ctrl_pdata->dfps_mutex);
+	/*
+	 * blocked here, untill call back called
+	 */
+	kfree(buf);
+	return ctrl->rx_buf.len;
 }
 
 
