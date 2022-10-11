@@ -1618,12 +1618,13 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	if (ctrl->on_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
 
+	panel_state = MIPI_RESUME_STATE;
+
 	if (msd.mfd->bl_previous) {
 		msd.mfd->bl_level = msd.mfd->bl_previous;
 		mdss_dsi_panel_bl_ctrl(pdata, msd.mfd->bl_level);
 	}
 
-	panel_state = MIPI_RESUME_STATE;
 #if defined(CONFIG_LCD_CLASS_DEVICE)
 	mdss_dsi_panel_cabc_dcs(ctrl, msd.dstat.siop_status);
 #endif
