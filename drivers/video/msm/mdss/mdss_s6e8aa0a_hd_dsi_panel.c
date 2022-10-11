@@ -1558,9 +1558,7 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 
 				flag = 0;
 				msd.mfd->bl_level = bl_level;
-
-				if (msd.mfd->bl_level)
-					msd.mfd->bl_previous = msd.mfd->bl_level;
+				msd.mfd->bl_previous = msd.mfd->bl_level;
 
 				cmds_sent = prepare_brightness_control_cmd_array(0x60, msd.mfd->bl_level);
 
