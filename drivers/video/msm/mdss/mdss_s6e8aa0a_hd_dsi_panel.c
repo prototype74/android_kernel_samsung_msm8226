@@ -1550,9 +1550,6 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 	}
 #endif
 
-	if(bl_level)
-	msd.mfd->bl_previous = bl_level;
-
 	switch (ctrl_pdata->bklt_ctrl) {
 
 	case BL_DCS_CMD:
@@ -1560,8 +1557,12 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 			if (mpd.prepare_brightness_control_cmd_array) {
 
 				flag = 0;
+				msd.mfd->bl_level = bl_level;
 
-				cmds_sent = prepare_brightness_control_cmd_array(0x60,bl_level);
+				if (msd.mfd->bl_level)
+					msd.mfd->bl_previous = msd.mfd->bl_level;
+
+				cmds_sent = prepare_brightness_control_cmd_array(0x60, msd.mfd->bl_level);
 
 				if (cmds_sent < 0){
 					pr_info("cmds_sent: %x\n", cmds_sent);
@@ -1621,8 +1622,10 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	if (ctrl->on_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
 
-	if (msd.mfd->bl_previous)
-		mdss_dsi_panel_bl_ctrl(pdata, msd.mfd->bl_previous);
+	if (msd.mfd->bl_previous) {
+		msd.mfd->bl_level = msd.mfd->bl_previous;
+		mdss_dsi_panel_bl_ctrl(pdata, msd.mfd->bl_level);
+	}
 
 	panel_state = MIPI_RESUME_STATE;
 #if defined(CONFIG_LCD_CLASS_DEVICE)
