@@ -1536,12 +1536,10 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 #endif
 	}
 
-#if !defined(CONFIG_MACH_S3VE3G_EUR)
-	if( msd.mfd->panel_power_on == false){
+	if (panel_state != MIPI_RESUME_STATE) {
 		pr_err("%s: panel power off no bl ctrl\n", __func__);
 		return;
 	}
-#endif
 
 #if defined(CONFIG_ESD_ERR_FG_RECOVERY)
 	if (err_fg_working) {
