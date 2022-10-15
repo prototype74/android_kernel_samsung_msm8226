@@ -184,32 +184,6 @@ static ssize_t accessibility_store(struct device *dev,
 	return size;
 }
 
-static ssize_t negative_show(struct device *dev,
-					      struct device_attribute *attr,
-					      char *buf)
-{
-	return snprintf(buf, 256, "Current negative Value : %s\n",
-		(mdnie_tun_state.accessibility == 1) ? "Enabled" : "Disabled");
-}
-
-static ssize_t negative_store(struct device *dev,
-					       struct device_attribute *attr,
-					       const char *buf, size_t size)
-{
-	int value;
-
-	sscanf(buf, "%d", &value);
-
-	DPRINT("negative_store, input value = %d\n", value);
-	if (mdnie_tun_state.accessibility == value)
-		return size;
-	mdnie_tun_state.accessibility = value;
-
-	mDNIe_Set_Mode();
-
-	return size;
-}
-
 static ssize_t playspeed_show(struct device *dev,
 			struct device_attribute *attr,
 			char *buf)
@@ -232,7 +206,6 @@ static ssize_t playspeed_store(struct device *dev,
 }
 
 static DEVICE_ATTR(accessibility, 0664, accessibility_show, accessibility_store);
-static DEVICE_ATTR(negative, 0664, negative_show, negative_store);
 static DEVICE_ATTR(playspeed, 0664, playspeed_show, playspeed_store);
 
 static struct class *mdnie_class;
@@ -261,11 +234,6 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_accessibility) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_accessibility.attr.name);
-
-	if (device_create_file
-		(tune_mdnie_dev, &dev_attr_negative) < 0)
-		DPRINT("Failed to create device file(%s)!\n",
-			dev_attr_negative.attr.name);
 
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_playspeed) < 0)
