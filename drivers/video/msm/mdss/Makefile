@@ -113,7 +113,7 @@ CFLAGS_smart_mtp_s6e3ha1.o += -Wno-unused-variable
 
 mdss-dsi-objs += msm_mdss_io_8974.o
 ifeq ($(CONFIG_FB_MSM_MDSS_S6E8AA0A_HD_PANEL),y)
-obj-$(CONFIG_MDNIE_LITE_TUNING) += mdss_video_enhance.o
+obj-$(CONFIG_MDNIE_LITE_TUNING) += mdnie_lite_tuning_s3ve.o
 else ifeq ($(CONFIG_FB_MSM_MIPI_SAMSUNG_OCTA_CMD_WQXGA_S6TNMR7_PT_PANEL),y)
 obj-$(CONFIG_MDNIE_LITE_TUNING) += mdnie_lite_tuning_chagall.o
 else

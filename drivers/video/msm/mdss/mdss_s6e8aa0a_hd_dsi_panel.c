@@ -26,8 +26,7 @@
 	#include <linux/lcd.h>
 #endif
 #include "mdss_fb.h"
-//#include "mdnie_lite_tuning.h"
-#include "mdss_video_enhance.h"
+#include "mdnie_lite_tuning_s3ve.h"
 #include "mdss_dsi.h"
 #include "mdss_s6e8aa0a_panel.h"
 #include "dlog.h"

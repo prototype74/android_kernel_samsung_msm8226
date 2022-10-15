@@ -105,7 +105,7 @@ static struct mdp_ar_gc_lut_data lin_gc_data[GC_LUT_SEGMENTS] = {
 	{4095,   0, 0}, {4095, 0, 32640}
 };
 
-#if defined(CONFIG_MDNIE_TFT_MSM8X26) || defined (CONFIG_FB_MSM_MDSS_S6E8AA0A_HD_PANEL) || defined(CONFIG_MDNIE_VIDEO_ENHANCED)
+#if defined(CONFIG_MDNIE_TFT_MSM8X26) || defined(CONFIG_MDNIE_VIDEO_ENHANCED)
 struct mdp_pcc_cfg_data pcc_reverse = {
 	.block = MDP_LOGICAL_BLOCK_DISP_0,
 	.ops = MDP_PP_OPS_WRITE | MDP_PP_OPS_ENABLE,
@@ -5439,7 +5439,7 @@ int mdss_mdp_calib_mode(struct msm_fb_data_type *mfd,
 	return 0;
 }
 
-#if defined(CONFIG_MDNIE_TFT_MSM8X26) || defined (CONFIG_FB_MSM_MDSS_S6E8AA0A_HD_PANEL) || defined(CONFIG_MDNIE_VIDEO_ENHANCED)
+#if defined(CONFIG_MDNIE_TFT_MSM8X26) || defined(CONFIG_MDNIE_VIDEO_ENHANCED)
 void mdss_negative_color(int is_negative_on)
 {
 	u32 copyback;
