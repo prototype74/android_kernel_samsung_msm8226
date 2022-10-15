@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _MDNIE_LITE_TUNING_S3VE3G_H_
-#define _MDNIE_LITE_TUNING_S3VE3G_H_
+#ifndef _MDNIE_LITE_TUNING_S3VE_H_
+#define _MDNIE_LITE_TUNING_S3VE_H_
 
 enum ACCESSIBILITY {
     ACCESSIBILITY_OFF = 0,
@@ -36,4 +36,4 @@ void init_mdnie_class(void);
 void is_negative_on(void);
 void mDNIe_Set_Mode(void);
 
-#endif /*_MDNIE_LITE_TUNING_S3VE3G_H_*/
+#endif /*_MDNIE_LITE_TUNING_S3VE_H_*/
