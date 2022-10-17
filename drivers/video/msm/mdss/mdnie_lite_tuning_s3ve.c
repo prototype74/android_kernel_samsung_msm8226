@@ -20,8 +20,9 @@
 #include <linux/err.h>
 #include <linux/device.h>
 
-#include "mdnie_lite_tuning_s3ve.h"
 #include "mdss_mdp.h"
+#include "mdnie_lite_tuning_s3ve.h"
+#include "mdnie_lite_tuning_data_s3ve.h"
 
 #define MDNIE_LITE_TUN_DEBUG
 
@@ -45,35 +46,15 @@ const char accessibility_name[ACCESSIBILITY_MAX][20] = {
 	"SCREEN_CURTAIN_MODE",
 };
 
-static struct mdp_pcc_cfg_data pcc_reverse = {
-	.block = MDP_LOGICAL_BLOCK_DISP_0,
-	.ops = MDP_PP_OPS_WRITE | MDP_PP_OPS_ENABLE,
-	.r = { 0x00007ff8, 0xffff8000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-			0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
-	.g = { 0x00007ff8, 0x00000000, 0xffff8000, 0x00000000, 0x00000000, 0x00000000,
-			0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
-	.b = { 0x00007ff8, 0x00000000, 0x00000000, 0xffff8000, 0x00000000, 0x00000000,
-			0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
-};
-
-static struct mdp_pcc_cfg_data pcc_normal = {
-	.block = MDP_LOGICAL_BLOCK_DISP_0,
-	.ops = MDP_PP_OPS_WRITE | MDP_PP_OPS_DISABLE,
-	.r = { 0x00000000, 0x00008000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-			0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
-	.g = { 0x00000000, 0x00000000, 0x00008000, 0x00000000, 0x00000000, 0x00000000,
-			0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
-	.b = { 0x00000000, 0x00000000, 0x00000000, 0x00008000, 0x00000000, 0x00000000,
-			0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
-};
-
-static void mdss_negative_color(int is_negative_on)
+static void mdss_set_tuning(struct pcc_color_cfg color_cfg, struct pa_adj adj_cfg)
 {
 	u32 copyback;
 	int i;
 	struct mdss_mdp_ctl *ctl;
 	struct mdss_mdp_ctl *ctl_d = NULL;
 	struct mdss_data_type *mdata;
+	struct mdp_pcc_cfg_data pcc_cfg;
+	struct mdp_pa_cfg_data pa_cfg;
 
 	mdata = mdss_mdp_get_mdata();
 	for (i = 0; i < mdata->nctl; i++) {
@@ -83,14 +64,33 @@ static void mdss_negative_color(int is_negative_on)
 			break;
 		}
 	}
-	if (ctl_d) {
-		if (is_negative_on)
-			mdss_mdp_pcc_config(&pcc_reverse, &copyback);
-		else
-			mdss_mdp_pcc_config(&pcc_normal, &copyback);
-	} else {
+
+	if (!ctl_d) {
 		DPRINT("%s:ctl_d is NULL ", __func__);
+		return;
 	}
+
+	memset(&pcc_cfg, 0, sizeof(struct mdp_pcc_cfg_data));
+	memset(&pa_cfg, 0, sizeof(struct mdp_pa_cfg_data));
+
+	pcc_cfg.block = MDP_LOGICAL_BLOCK_DISP_0;
+	pcc_cfg.ops = MDP_PP_OPS_WRITE | color_cfg.op;
+	pcc_cfg.r.c = color_cfg.r.c;
+	pcc_cfg.g.c = color_cfg.g.c;
+	pcc_cfg.b.c = color_cfg.b.c;
+	pcc_cfg.r.r = color_cfg.r.r;
+	pcc_cfg.g.g = color_cfg.g.g;
+	pcc_cfg.b.b = color_cfg.b.b;
+
+	pa_cfg.block = MDP_LOGICAL_BLOCK_DISP_0;
+	pa_cfg.pa_data.flags = MDP_PP_OPS_WRITE | adj_cfg.op;
+	pa_cfg.pa_data.hue_adj = adj_cfg.hue;
+	pa_cfg.pa_data.sat_adj = adj_cfg.sat;
+	pa_cfg.pa_data.val_adj = adj_cfg.val;
+	pa_cfg.pa_data.cont_adj = adj_cfg.cont;
+
+	mdss_mdp_pcc_config(&pcc_cfg, &copyback);
+	mdss_mdp_pa_config(&pa_cfg, &copyback);
 }
 
 void mDNIe_Set_Mode(void)
@@ -104,12 +104,12 @@ void mDNIe_Set_Mode(void)
 
 	switch (mdnie_tun_state.accessibility) {
 		case NEGATIVE:
-			mdss_negative_color(1);
+			mdss_set_tuning(NEGATIVE_MODE, DYNAMIC_UI_2);
 			break;
 		case COLOR_BLIND:
 		case SCREEN_CURTAIN:
 		case ACCESSIBILITY_OFF:
-			mdss_negative_color(0);
+			mdss_set_tuning(DYNAMIC_UI_1, DYNAMIC_UI_2);
 		default:
 			break;
 	}
