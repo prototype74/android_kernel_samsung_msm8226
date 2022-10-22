@@ -84,12 +84,12 @@ static void mdss_set_tuning(struct pcc_color_cfg color_cfg, struct pa_adj adj_cf
 
 	pcc_cfg.block = MDP_LOGICAL_BLOCK_DISP_0;
 	pcc_cfg.ops = MDP_PP_OPS_WRITE | color_cfg.op;
-	pcc_cfg.r.c = color_cfg.r.c;
-	pcc_cfg.g.c = color_cfg.g.c;
-	pcc_cfg.b.c = color_cfg.b.c;
-	pcc_cfg.r.r = color_cfg.r.r;
-	pcc_cfg.g.g = color_cfg.g.g;
-	pcc_cfg.b.b = color_cfg.b.b;
+	pcc_cfg.r.c = color_cfg.rc;
+	pcc_cfg.g.c = color_cfg.gc;
+	pcc_cfg.b.c = color_cfg.bc;
+	pcc_cfg.r.r = color_cfg.r;
+	pcc_cfg.g.g = color_cfg.g;
+	pcc_cfg.b.b = color_cfg.b;
 
 	pa_cfg.block = MDP_LOGICAL_BLOCK_DISP_0;
 	pa_cfg.pa_data.flags = MDP_PP_OPS_WRITE | adj_cfg.op;
@@ -104,6 +104,8 @@ static void mdss_set_tuning(struct pcc_color_cfg color_cfg, struct pa_adj adj_cf
 
 void mDNIe_Set_Mode(void)
 {
+	struct tunes mdnie_cfg;
+
 	if (!mdnie_tun_state.mdnie_enable) {
 		DPRINT("[ERROR] mDNIE engine is OFF.\n");
 		return;
@@ -111,30 +113,14 @@ void mDNIe_Set_Mode(void)
 
 	play_speed_1_5 = 0;
 
-	if (mdnie_tun_state.accessibility) {
-		if (mdnie_tun_state.accessibility == NEGATIVE)
-			mdss_set_tuning(NEGATIVE_MODE, NORMAL_UI_2);
-		else
-			mdss_set_tuning(NORMAL_UI_1, NORMAL_UI_2);
-	}
-	else {
-		switch (mdnie_tun_state.background) {
-			case DYNAMIC_MODE:
-				mdss_set_tuning(DYNAMIC_UI, NORMAL_UI_2);
-				break;
-			case STANDARD_MODE:
-				mdss_set_tuning(STANDARD_UI, NORMAL_UI_2);
-				break;
-			case NATURAL_MODE:
-				mdss_set_tuning(STANDARD_UI, NATURAL_UI);
-				break;
-			case MOVIE_MODE:
-			case AUTO_MODE:
-			default:
-				mdss_set_tuning(NORMAL_UI_1, NORMAL_UI_2);
-				break;
-		}
-	}
+	memset(&mdnie_cfg, 0, sizeof(struct tunes));
+
+	if (mdnie_tun_state.accessibility)
+		mdnie_cfg = blind_tunes[mdnie_tun_state.accessibility];
+	else
+		mdnie_cfg = mdnie_tunes[mdnie_tun_state.background];
+
+	mdss_set_tuning(mdnie_cfg.pcc, mdnie_cfg.pa);
 
 	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d)\n",
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
