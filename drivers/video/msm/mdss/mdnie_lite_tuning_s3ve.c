@@ -111,18 +111,30 @@ void mDNIe_Set_Mode(void)
 
 	play_speed_1_5 = 0;
 
-	switch (mdnie_tun_state.accessibility) {
-		case NEGATIVE:
-			mdss_set_tuning(NEGATIVE_MODE, DYNAMIC_UI_2);
-			break;
-		case COLOR_BLIND:
-		case SCREEN_CURTAIN:
-		case ACCESSIBILITY_OFF:
-			mdss_set_tuning(DYNAMIC_UI_1, DYNAMIC_UI_2);
-		default:
-			break;
+	if (mdnie_tun_state.accessibility) {
+		if (mdnie_tun_state.accessibility == NEGATIVE)
+			mdss_set_tuning(NEGATIVE_MODE, NORMAL_UI_2);
+		else
+			mdss_set_tuning(NORMAL_UI_1, NORMAL_UI_2);
 	}
-
+	else {
+		switch (mdnie_tun_state.background) {
+			case DYNAMIC_MODE:
+				mdss_set_tuning(DYNAMIC_UI, NORMAL_UI_2);
+				break;
+			case STANDARD_MODE:
+				mdss_set_tuning(STANDARD_UI, NORMAL_UI_2);
+				break;
+			case NATURAL_MODE:
+				mdss_set_tuning(STANDARD_UI, NATURAL_UI);
+				break;
+			case MOVIE_MODE:
+			case AUTO_MODE:
+			default:
+				mdss_set_tuning(NORMAL_UI_1, NORMAL_UI_2);
+				break;
+		}
+	}
 
 	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d)\n",
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,

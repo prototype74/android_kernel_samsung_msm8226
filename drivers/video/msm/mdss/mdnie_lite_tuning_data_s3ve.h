@@ -43,7 +43,35 @@ struct pcc_color_cfg NEGATIVE_MODE = {
 	.b.b = 0xffff8000, // scr_Kb
 };
 
-struct pcc_color_cfg DYNAMIC_UI_1 = { // default data
+struct pcc_color_cfg STANDARD_UI = {
+	.op = MDP_PP_OPS_ENABLE,
+	.r.c = 0x00000000,
+	.g.c = 0x00000000,
+	.b.c = 0x00000000,
+	.r.r = 0x00008000, // scr_Wr
+	.g.g = 0x00007C7C, // scr_Wg
+	.b.b = 0x000077F7, // scr_Wb
+};
+
+struct pa_adj NATURAL_UI = {
+	.op = MDP_PP_OPS_ENABLE,
+	.hue = 0x00,
+	.sat = 0xef,
+	.val = 0xff,
+	.cont = 0xff,
+};
+
+struct pcc_color_cfg DYNAMIC_UI = {
+	.op = MDP_PP_OPS_ENABLE,
+	.r.c = 0x00000000,
+	.g.c = 0x00000000,
+	.b.c = 0x00000000,
+	.r.r = 0x00008787, // scr_Wr
+	.g.g = 0x00008787, // scr_Wg
+	.b.b = 0x00008787, // scr_Wb
+};
+
+struct pcc_color_cfg NORMAL_UI_1 = { // default data
 	.op = MDP_PP_OPS_DISABLE,
 	/* complementary colors OFF */
 	.r.c = 0x00000000,
@@ -54,14 +82,13 @@ struct pcc_color_cfg DYNAMIC_UI_1 = { // default data
 	.b.b = 0x00008000, // scr_Wb
 };
 
-struct pa_adj DYNAMIC_UI_2 = { // default data
+struct pa_adj NORMAL_UI_2 = { // default data
 	.op = MDP_PP_OPS_DISABLE,
 	.hue = 0x00,
 	.sat = 0xff,
 	.val = 0xff,
 	.cont = 0xff,
 };
-
 
 #endif /*_MDNIE_LITE_TUNING_DATA_S3VE_H_*/
 
