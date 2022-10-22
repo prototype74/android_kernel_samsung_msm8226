@@ -19,6 +19,15 @@
 #ifndef _MDNIE_LITE_TUNING_S3VE_H_
 #define _MDNIE_LITE_TUNING_S3VE_H_
 
+enum BACKGROUND {
+	DYNAMIC_MODE = 0,
+	STANDARD_MODE,
+	NATURAL_MODE,
+	MOVIE_MODE,
+	AUTO_MODE,
+	MAX_BACKGROUND_MODE,
+};
+
 enum ACCESSIBILITY {
     ACCESSIBILITY_OFF = 0,
 	NEGATIVE,
@@ -29,6 +38,7 @@ enum ACCESSIBILITY {
 
 struct mdnie_lite_tun_type {
 	bool mdnie_enable;
+	enum BACKGROUND background;
 	enum ACCESSIBILITY accessibility;
 };
 

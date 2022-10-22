@@ -36,7 +36,16 @@ int play_speed_1_5;
 
 struct mdnie_lite_tun_type mdnie_tun_state = {
 	.mdnie_enable = false,
+	.background = AUTO_MODE,
 	.accessibility = ACCESSIBILITY_OFF,
+};
+
+const char background_name[MAX_BACKGROUND_MODE][10] = {
+	"DYNAMIC",
+	"STANDARD",
+	"NATURAL",
+	"MOVIE",
+	"AUTO",
 };
 
 const char accessibility_name[ACCESSIBILITY_MAX][20] = {
@@ -114,7 +123,9 @@ void mDNIe_Set_Mode(void)
 			break;
 	}
 
-	DPRINT("mDNIe_Set_Mode end , %s(%d)\n",
+
+	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d)\n",
+		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
 		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility);
 }
 
@@ -128,6 +139,47 @@ void is_negative_on(void)
 	DPRINT("is negative Mode On = %d\n", mdnie_tun_state.accessibility);
 
 	mDNIe_Set_Mode();
+}
+
+static ssize_t mode_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	DPRINT("Current Background Mode : %s\n",
+		background_name[mdnie_tun_state.background]);
+
+	return snprintf(buf, 256, "Current Background Mode : %s\n",
+		background_name[mdnie_tun_state.background]);
+}
+
+static ssize_t mode_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t size)
+{
+	int value;
+	int backup;
+
+	sscanf(buf, "%d", &value);
+
+	if (value < DYNAMIC_MODE || value >= MAX_BACKGROUND_MODE) {
+		DPRINT("[ERROR] wrong backgound mode value : %d\n",
+			value);
+		return size;
+	}
+	backup = mdnie_tun_state.background;
+	if (mdnie_tun_state.background == value)
+		return size;
+	mdnie_tun_state.background = value;
+
+	if (mdnie_tun_state.accessibility == NEGATIVE) {
+		DPRINT("already negative mode(%d), do not set background(%d)\n",
+			mdnie_tun_state.accessibility, mdnie_tun_state.background);
+	} else {
+		DPRINT(" %s : (%s) -> (%s)\n",
+			__func__, background_name[backup], background_name[mdnie_tun_state.background]);
+
+		mDNIe_Set_Mode();
+	}
+
+	return size;
 }
 
 static ssize_t accessibility_show(struct device *dev,
@@ -206,6 +258,7 @@ static ssize_t playspeed_store(struct device *dev,
 }
 
 static DEVICE_ATTR(accessibility, 0664, accessibility_show, accessibility_store);
+static DEVICE_ATTR(mode, 0664, mode_show, mode_store);
 static DEVICE_ATTR(playspeed, 0664, playspeed_show, playspeed_store);
 
 static struct class *mdnie_class;
@@ -234,6 +287,11 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_accessibility) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_accessibility.attr.name);
+
+	if (device_create_file
+		(tune_mdnie_dev, &dev_attr_mode) < 0)
+		pr_err("Failed to create device file(%s)!\n",
+			dev_attr_mode.attr.name);
 
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_playspeed) < 0)
