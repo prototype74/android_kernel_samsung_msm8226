@@ -87,9 +87,15 @@ static void mdss_set_tuning(struct pcc_color_cfg color_cfg, struct pa_adj adj_cf
 	pcc_cfg.r.c = color_cfg.rc;
 	pcc_cfg.g.c = color_cfg.gc;
 	pcc_cfg.b.c = color_cfg.bc;
-	pcc_cfg.r.r = color_cfg.r;
-	pcc_cfg.g.g = color_cfg.g;
-	pcc_cfg.b.b = color_cfg.b;
+	pcc_cfg.r.r = color_cfg.rr;
+	pcc_cfg.r.g = color_cfg.rg;
+	pcc_cfg.r.b = color_cfg.rb;
+	pcc_cfg.g.r = color_cfg.gr;
+	pcc_cfg.g.g = color_cfg.gg;
+	pcc_cfg.g.b = color_cfg.gb;
+	pcc_cfg.b.r = color_cfg.br;
+	pcc_cfg.b.g = color_cfg.bg;
+	pcc_cfg.b.b = color_cfg.bb;
 
 	pa_cfg.block = MDP_LOGICAL_BLOCK_DISP_0;
 	pa_cfg.pa_data.flags = MDP_PP_OPS_WRITE | adj_cfg.op;
