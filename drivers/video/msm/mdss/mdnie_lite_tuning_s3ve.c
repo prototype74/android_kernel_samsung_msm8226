@@ -53,6 +53,8 @@ const char accessibility_name[ACCESSIBILITY_MAX][20] = {
 	"NEGATIVE_MODE",
 	"COLOR_BLIND_MODE",
 	"SCREEN_CURTAIN_MODE",
+	"GRAYSCALE_MODE",
+	"GRAY_NEGATIVE_MODE",
 };
 
 static void mdss_set_tuning(struct pcc_color_cfg color_cfg, struct pa_adj adj_cfg)
@@ -222,6 +224,16 @@ static ssize_t accessibility_store(struct device *dev,
 		if (mdnie_tun_state.accessibility == SCREEN_CURTAIN)
 			return size;
 		mdnie_tun_state.accessibility = SCREEN_CURTAIN;
+	}
+	else if (cmd_value == GRAYSCALE) {
+		if (mdnie_tun_state.accessibility == GRAYSCALE)
+			return size;
+		mdnie_tun_state.accessibility = GRAYSCALE;
+	}
+	else if (cmd_value == GRAYSCALE_NEGATIVE) {
+		if (mdnie_tun_state.accessibility == GRAYSCALE_NEGATIVE)
+			return size;
+		mdnie_tun_state.accessibility = GRAYSCALE_NEGATIVE;
 	}
 	else if (cmd_value == ACCESSIBILITY_OFF) {
 		if (mdnie_tun_state.accessibility == ACCESSIBILITY_OFF)

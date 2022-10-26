@@ -39,6 +39,8 @@ struct tunes blind_tunes[ACCESSIBILITY_MAX] = {
 	NEGATIVE,
 	COLOR_BLIND,
 	SCREEN_CURTAIN,
+	GRAYSCALE,
+	GRAYSCALE_NEGATIVE,
 */
 	{
 		{
@@ -127,6 +129,54 @@ struct tunes blind_tunes[ACCESSIBILITY_MAX] = {
 			0x00000000, //br
 			0x00000000, //bg
 			0x00008000, //bb
+		},
+		{
+			MDP_PP_OPS_DISABLE,
+			0x00,
+			0xff,
+			0xff,
+			0xff,
+		}
+	},
+	{
+		{
+			MDP_PP_OPS_ENABLE,
+			0x00000000, //rc
+			0x00000000, //gc
+			0x00000000, //bc
+			0x00002626, //rr
+			0x00004B4B, //rg
+			0x00000E8F, //rb
+			0x00002626, //gr
+			0x00004B4B, //gg
+			0x00000E8F, //gb
+			0x00002626, //br
+			0x00004B4B, //bg
+			0x00000E8F, //bb
+		},
+		{
+			MDP_PP_OPS_DISABLE,
+			0x00,
+			0xff,
+			0xff,
+			0xff,
+		}
+	},
+	{
+		{
+			MDP_PP_OPS_ENABLE,
+			0x00007ff8, //rc
+			0x00007ff8, //gc
+			0x00007ff8, //bc
+			0xffffD9D9, //rr
+			0xffffB4B4, //rg
+			0xffffF170, //rb
+			0xffffD9D9, //gr
+			0xffffB4B4, //gg
+			0xffffF170, //gb
+			0xffffD9D9, //br
+			0xffffB4B4, //bg
+			0xffffF170, //bb
 		},
 		{
 			MDP_PP_OPS_DISABLE,
