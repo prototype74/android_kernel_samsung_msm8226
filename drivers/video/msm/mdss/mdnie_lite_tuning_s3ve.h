@@ -19,6 +19,21 @@
 #ifndef _MDNIE_LITE_TUNING_S3VE_H_
 #define _MDNIE_LITE_TUNING_S3VE_H_
 
+enum SCENARIO {
+	mDNIe_UI_MODE,
+	mDNIe_VIDEO_MODE,
+	mDNIe_VIDEO_WARM_MODE,
+	mDNIe_VIDEO_COLD_MODE,
+	mDNIe_CAMERA_MODE,
+	mDNIe_NAVI,
+	mDNIe_GALLERY,
+	mDNIe_VT_MODE,
+	mDNIe_BROWSER_MODE,
+	mDNIe_eBOOK_MODE,
+	mDNIe_EMAIL_MODE,
+	MAX_mDNIe_MODE,
+};
+
 enum BACKGROUND {
 	DYNAMIC_MODE = 0,
 	STANDARD_MODE,
@@ -40,6 +55,7 @@ enum ACCESSIBILITY {
 
 struct mdnie_lite_tun_type {
 	bool mdnie_enable;
+	enum SCENARIO scenario;
 	enum BACKGROUND background;
 	enum ACCESSIBILITY accessibility;
 };

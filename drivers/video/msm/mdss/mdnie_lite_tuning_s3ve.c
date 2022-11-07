@@ -36,8 +36,23 @@ int play_speed_1_5;
 
 struct mdnie_lite_tun_type mdnie_tun_state = {
 	.mdnie_enable = false,
+	.scenario = mDNIe_UI_MODE,
 	.background = AUTO_MODE,
 	.accessibility = ACCESSIBILITY_OFF,
+};
+
+char scenario_name[MAX_mDNIe_MODE][16] = {
+	"UI_MODE",
+	"VIDEO_MODE",
+	"VIDEO_WARM_MODE",
+	"VIDEO_COLD_MODE",
+	"CAMERA_MODE",
+	"NAVI",
+	"GALLERY_MODE",
+	"VT_MODE",
+	"BROWSER",
+	"eBOOK",
+	"EMAIL",
 };
 
 const char background_name[MAX_BACKGROUND_MODE][10] = {
@@ -119,6 +134,12 @@ void mDNIe_Set_Mode(void)
 		return;
 	}
 
+	if (mdnie_tun_state.scenario < mDNIe_UI_MODE || mdnie_tun_state.scenario >= MAX_mDNIe_MODE) {
+		DPRINT("[ERROR] wrong Scenario mode value : %d\n",
+			mdnie_tun_state.scenario);
+		return;
+	}
+
 	play_speed_1_5 = 0;
 
 	if (mdnie_tun_state.accessibility)
@@ -128,7 +149,8 @@ void mDNIe_Set_Mode(void)
 
 	mdss_set_tuning(mdnie_cfg);
 
-	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d)\n",
+	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d), %s(%d)\n",
+		scenario_name[mdnie_tun_state.scenario], mdnie_tun_state.scenario,
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
 		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility);
 }
@@ -183,6 +205,48 @@ static ssize_t mode_store(struct device *dev,
 		mDNIe_Set_Mode();
 	}
 
+	return size;
+}
+
+static ssize_t scenario_show(struct device *dev,
+					 struct device_attribute *attr,
+					 char *buf)
+{
+	DPRINT("Current Scenario Mode : %s\n",
+		scenario_name[mdnie_tun_state.scenario]);
+
+	return snprintf(buf, 256, "Current Scenario Mode : %s\n",
+		scenario_name[mdnie_tun_state.scenario]);
+}
+
+static ssize_t scenario_store(struct device *dev,
+					  struct device_attribute *attr,
+					  const char *buf, size_t size)
+{
+	int value;
+	int backup;
+
+	sscanf(buf, "%d", &value);
+
+	if (value < mDNIe_UI_MODE || value >= MAX_mDNIe_MODE) {
+		DPRINT("[ERROR] wrong Scenario mode value : %d\n",
+			value);
+		return size;
+	}
+
+	backup = mdnie_tun_state.scenario;
+	if (mdnie_tun_state.scenario == value)
+		return size;
+	mdnie_tun_state.scenario = value;
+
+	if (mdnie_tun_state.accessibility == NEGATIVE) {
+		DPRINT("already negative mode(%d), do not set mode(%d)\n",
+			mdnie_tun_state.accessibility, mdnie_tun_state.scenario);
+	} else {
+		DPRINT(" %s : (%s) -> (%s)\n",
+			__func__, scenario_name[backup], scenario_name[mdnie_tun_state.scenario]);
+		mDNIe_Set_Mode();
+	}
 	return size;
 }
 
@@ -274,6 +338,7 @@ static ssize_t playspeed_store(struct device *dev,
 static DEVICE_ATTR(accessibility, 0664, accessibility_show, accessibility_store);
 static DEVICE_ATTR(mode, 0664, mode_show, mode_store);
 static DEVICE_ATTR(playspeed, 0664, playspeed_show, playspeed_store);
+static DEVICE_ATTR(scenario, 0664, scenario_show, scenario_store);
 
 static struct class *mdnie_class;
 struct device *tune_mdnie_dev;
@@ -311,6 +376,11 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_playspeed) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_playspeed.attr.name);
+
+	if (device_create_file
+	    (tune_mdnie_dev, &dev_attr_scenario) < 0)
+		pr_err("Failed to create device file(%s)!\n",
+	       dev_attr_scenario.attr.name);
 
 	mdnie_tun_state.mdnie_enable = true;
 	DPRINT("end!\n");
