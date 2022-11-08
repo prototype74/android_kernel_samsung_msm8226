@@ -145,7 +145,7 @@ void mDNIe_Set_Mode(void)
 	if (mdnie_tun_state.accessibility)
 		memcpy(mdnie_cfg, blind_tunes[mdnie_tun_state.accessibility], sizeof(mdnie_cfg));
 	else
-		memcpy(mdnie_cfg, mdnie_tunes[mdnie_tun_state.background], sizeof(mdnie_cfg));
+		memcpy(mdnie_cfg, mdnie_tunes[mdnie_tun_state.scenario][mdnie_tun_state.background], sizeof(mdnie_cfg));
 
 	mdss_set_tuning(mdnie_cfg);
 
