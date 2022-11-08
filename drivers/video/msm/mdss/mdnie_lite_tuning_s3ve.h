@@ -43,6 +43,12 @@ enum BACKGROUND {
 	MAX_BACKGROUND_MODE,
 };
 
+enum OUTDOOR {
+	OUTDOOR_OFF_MODE = 0,
+	OUTDOOR_ON_MODE,
+	MAX_OUTDOOR_MODE,
+};
+
 enum ACCESSIBILITY {
     ACCESSIBILITY_OFF = 0,
 	NEGATIVE,
@@ -57,6 +63,7 @@ struct mdnie_lite_tun_type {
 	bool mdnie_enable;
 	enum SCENARIO scenario;
 	enum BACKGROUND background;
+	enum OUTDOOR outdoor;
 	enum ACCESSIBILITY accessibility;
 };
 

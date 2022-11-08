@@ -38,6 +38,7 @@ struct mdnie_lite_tun_type mdnie_tun_state = {
 	.mdnie_enable = false,
 	.scenario = mDNIe_UI_MODE,
 	.background = AUTO_MODE,
+	.outdoor = OUTDOOR_OFF_MODE,
 	.accessibility = ACCESSIBILITY_OFF,
 };
 
@@ -61,6 +62,11 @@ const char background_name[MAX_BACKGROUND_MODE][10] = {
 	"NATURAL",
 	"MOVIE",
 	"AUTO",
+};
+
+const char outdoor_name[MAX_OUTDOOR_MODE][20] = {
+	"OUTDOOR_OFF_MODE",
+	"OUTDOOR_ON_MODE",
 };
 
 const char accessibility_name[ACCESSIBILITY_MAX][20] = {
@@ -145,13 +151,16 @@ void mDNIe_Set_Mode(void)
 	if (mdnie_tun_state.accessibility)
 		memcpy(mdnie_cfg, blind_tunes[mdnie_tun_state.accessibility], sizeof(mdnie_cfg));
 	else
-		memcpy(mdnie_cfg, mdnie_tunes[mdnie_tun_state.scenario][mdnie_tun_state.background], sizeof(mdnie_cfg));
+		memcpy(mdnie_cfg,
+		       mdnie_tunes[mdnie_tun_state.scenario][mdnie_tun_state.background][mdnie_tun_state.outdoor],
+		       sizeof(mdnie_cfg));
 
 	mdss_set_tuning(mdnie_cfg);
 
-	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d), %s(%d)\n",
+	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d), %s(%d), %s(%d)\n",
 		scenario_name[mdnie_tun_state.scenario], mdnie_tun_state.scenario,
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
+		outdoor_name[mdnie_tun_state.outdoor], mdnie_tun_state.outdoor,
 		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility);
 }
 
@@ -335,8 +344,52 @@ static ssize_t playspeed_store(struct device *dev,
 	return size;
 }
 
+static ssize_t outdoor_show(struct device *dev,
+					      struct device_attribute *attr,
+					      char *buf)
+{
+	DPRINT("Current outdoor Mode : %s\n",
+		outdoor_name[mdnie_tun_state.outdoor]);
+
+	return snprintf(buf, 256, "Current outdoor Mode : %s\n",
+		outdoor_name[mdnie_tun_state.outdoor]);
+}
+
+static ssize_t outdoor_store(struct device *dev,
+					       struct device_attribute *attr,
+					       const char *buf, size_t size)
+{
+	int value;
+	int backup;
+
+	sscanf(buf, "%d", &value);
+
+	DPRINT("outdoor value = %d, scenario = %d\n",
+		value, mdnie_tun_state.scenario);
+
+	if (value < OUTDOOR_OFF_MODE || value >= MAX_OUTDOOR_MODE)
+		DPRINT("[ERROR] : wrong outdoor mode value : %d\n", value);
+
+	backup = mdnie_tun_state.outdoor;
+	if (mdnie_tun_state.outdoor == value)
+		return size;
+	mdnie_tun_state.outdoor = value;
+
+	if (mdnie_tun_state.accessibility == NEGATIVE) {
+		DPRINT("already negative mode(%d), do not outdoor mode(%d)\n",
+			mdnie_tun_state.accessibility, mdnie_tun_state.outdoor);
+	} else {
+		DPRINT(" %s : (%s) -> (%s)\n",
+			__func__, outdoor_name[backup], outdoor_name[mdnie_tun_state.outdoor]);
+		mDNIe_Set_Mode();
+	}
+
+	return size;
+}
+
 static DEVICE_ATTR(accessibility, 0664, accessibility_show, accessibility_store);
 static DEVICE_ATTR(mode, 0664, mode_show, mode_store);
+static DEVICE_ATTR(outdoor, 0664, outdoor_show, outdoor_store);
 static DEVICE_ATTR(playspeed, 0664, playspeed_show, playspeed_store);
 static DEVICE_ATTR(scenario, 0664, scenario_show, scenario_store);
 
@@ -371,6 +424,11 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_mode) < 0)
 		pr_err("Failed to create device file(%s)!\n",
 			dev_attr_mode.attr.name);
+
+	if (device_create_file
+		(tune_mdnie_dev, &dev_attr_outdoor) < 0)
+		pr_err("Failed to create device file(%s)!\n",
+	       dev_attr_outdoor.attr.name);
 
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_playspeed) < 0)
