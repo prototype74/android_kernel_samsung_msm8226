@@ -62,6 +62,7 @@ const char background_name[MAX_BACKGROUND_MODE][10] = {
 	"NATURAL",
 	"MOVIE",
 	"AUTO",
+	"READING",
 };
 
 const char outdoor_name[MAX_OUTDOOR_MODE][20] = {
