@@ -150,6 +150,10 @@ void mDNIe_Set_Mode(void)
 
 	play_speed_1_5 = 0;
 
+	/*
+	* mDnie priority
+	* Bypass > Accessibility > Screen Mode
+	*/
 	if (mdnie_tun_state.mdnie_bypass == BYPASS_ENABLE)
 		memcpy(mdnie_cfg, DEFAULT_MDNIE, sizeof(mdnie_cfg));
 	else if (mdnie_tun_state.accessibility)
@@ -453,31 +457,37 @@ void init_mdnie_class(void)
 	if (IS_ERR(tune_mdnie_dev))
 		DPRINT("Failed to create mdnie device!\n");
 
+	/* ACCESSIBILITY */
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_accessibility) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_accessibility.attr.name);
 
+	/* MDNIE ON/OFF */
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_bypass) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_bypass.attr.name);
 
+	/* MODE */
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_mode) < 0)
 		pr_err("Failed to create device file(%s)!\n",
 			dev_attr_mode.attr.name);
 
+	/* OUTDOOR */
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_outdoor) < 0)
 		pr_err("Failed to create device file(%s)!\n",
 	       dev_attr_outdoor.attr.name);
 
+	/* PLAYSPEED */
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_playspeed) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_playspeed.attr.name);
 
+	/* APP */
 	if (device_create_file
 	    (tune_mdnie_dev, &dev_attr_scenario) < 0)
 		pr_err("Failed to create device file(%s)!\n",
