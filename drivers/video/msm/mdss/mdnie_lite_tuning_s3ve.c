@@ -42,7 +42,7 @@ struct mdnie_lite_tun_type mdnie_tun_state = {
 	.accessibility = ACCESSIBILITY_OFF,
 };
 
-char scenario_name[MAX_mDNIe_MODE][16] = {
+const char scenario_name[MAX_mDNIe_MODE][16] = {
 	"UI_MODE",
 	"VIDEO_MODE",
 	"VIDEO_WARM_MODE",
