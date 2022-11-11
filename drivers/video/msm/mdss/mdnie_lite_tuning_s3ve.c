@@ -55,6 +55,7 @@ const char scenario_name[MAX_mDNIe_MODE][16] = {
 	"BROWSER",
 	"eBOOK",
 	"EMAIL",
+	"TDMB",
 };
 
 const char background_name[MAX_BACKGROUND_MODE][10] = {
@@ -277,6 +278,11 @@ static ssize_t scenario_store(struct device *dev,
 	int backup;
 
 	sscanf(buf, "%d", &value);
+
+#ifdef CONFIG_TDMB
+	if (value == APP_ID_TDMB)
+		value = mDNIe_TDMB_MODE;
+#endif
 
 	if (value < mDNIe_UI_MODE || value >= MAX_mDNIe_MODE) {
 		DPRINT("[ERROR] wrong Scenario mode value : %d\n",

@@ -19,6 +19,8 @@
 #ifndef _MDNIE_LITE_TUNING_S3VE_H_
 #define _MDNIE_LITE_TUNING_S3VE_H_
 
+#define APP_ID_TDMB (20)
+
 enum BYPASS {
 	BYPASS_DISABLE = 0,
 	BYPASS_ENABLE,
@@ -36,6 +38,7 @@ enum SCENARIO {
 	mDNIe_BROWSER_MODE,
 	mDNIe_eBOOK_MODE,
 	mDNIe_EMAIL_MODE,
+	mDNIe_TDMB_MODE, /* linked to APP_ID_TDMB */
 	MAX_mDNIe_MODE,
 };
 
