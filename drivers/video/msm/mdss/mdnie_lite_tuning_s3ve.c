@@ -36,6 +36,7 @@ int play_speed_1_5;
 
 struct mdnie_lite_tun_type mdnie_tun_state = {
 	.mdnie_enable = false,
+	.mdnie_bypass = BYPASS_DISABLE,
 	.scenario = mDNIe_UI_MODE,
 	.background = AUTO_MODE,
 	.outdoor = OUTDOOR_OFF_MODE,
@@ -149,7 +150,9 @@ void mDNIe_Set_Mode(void)
 
 	play_speed_1_5 = 0;
 
-	if (mdnie_tun_state.accessibility)
+	if (mdnie_tun_state.mdnie_bypass == BYPASS_ENABLE)
+		memcpy(mdnie_cfg, DEFAULT_MDNIE, sizeof(mdnie_cfg));
+	else if (mdnie_tun_state.accessibility)
 		memcpy(mdnie_cfg, blind_tunes[mdnie_tun_state.accessibility], sizeof(mdnie_cfg));
 	else
 		memcpy(mdnie_cfg,
@@ -158,7 +161,8 @@ void mDNIe_Set_Mode(void)
 
 	mdss_set_tuning(mdnie_cfg);
 
-	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d), %s(%d), %s(%d)\n",
+	DPRINT("mDNIe_Set_Mode end , MDNIE_BYPASS(%d), %s(%d), %s(%d), %s(%d), %s(%d)\n",
+		mdnie_tun_state.mdnie_bypass,
 		scenario_name[mdnie_tun_state.scenario], mdnie_tun_state.scenario,
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
 		outdoor_name[mdnie_tun_state.outdoor], mdnie_tun_state.outdoor,
@@ -175,6 +179,38 @@ void is_negative_on(void)
 	DPRINT("is negative Mode On = %d\n", mdnie_tun_state.accessibility);
 
 	mDNIe_Set_Mode();
+}
+
+static ssize_t bypass_show(struct device *dev,
+					 struct device_attribute *attr,
+					 char *buf)
+{
+	DPRINT("Current MDNIE bypass : %s\n",
+		mdnie_tun_state.mdnie_bypass ? "ENABLE" : "DISABLE");
+
+	return snprintf(buf, 256, "Current MDNIE bypass : %s\n",
+		mdnie_tun_state.mdnie_bypass ? "ENABLE" : "DISABLE");
+}
+
+static ssize_t bypass_store(struct device *dev,
+					  struct device_attribute *attr,
+					  const char *buf, size_t size)
+{
+	int value;
+
+	sscanf(buf, "%d", &value);
+
+	if (value)
+		mdnie_tun_state.mdnie_bypass = BYPASS_ENABLE;
+	else
+		mdnie_tun_state.mdnie_bypass = BYPASS_DISABLE;
+
+	DPRINT("%s bypass : %s value : %d\n",
+		__func__, mdnie_tun_state.mdnie_bypass ? "ENABLE" : "DISABLE", value);
+
+	mDNIe_Set_Mode();
+
+	return size;
 }
 
 static ssize_t mode_show(struct device *dev,
@@ -389,6 +425,7 @@ static ssize_t outdoor_store(struct device *dev,
 }
 
 static DEVICE_ATTR(accessibility, 0664, accessibility_show, accessibility_store);
+static DEVICE_ATTR(bypass, 0664, bypass_show, bypass_store);
 static DEVICE_ATTR(mode, 0664, mode_show, mode_store);
 static DEVICE_ATTR(outdoor, 0664, outdoor_show, outdoor_store);
 static DEVICE_ATTR(playspeed, 0664, playspeed_show, playspeed_store);
@@ -420,6 +457,11 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_accessibility) < 0)
 		DPRINT("Failed to create device file(%s)!=n",
 			dev_attr_accessibility.attr.name);
+
+	if (device_create_file
+		(tune_mdnie_dev, &dev_attr_bypass) < 0)
+		DPRINT("Failed to create device file(%s)!=n",
+			dev_attr_bypass.attr.name);
 
 	if (device_create_file
 		(tune_mdnie_dev, &dev_attr_mode) < 0)

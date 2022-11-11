@@ -19,6 +19,11 @@
 #ifndef _MDNIE_LITE_TUNING_S3VE_H_
 #define _MDNIE_LITE_TUNING_S3VE_H_
 
+enum BYPASS {
+	BYPASS_DISABLE = 0,
+	BYPASS_ENABLE,
+};
+
 enum SCENARIO {
 	mDNIe_UI_MODE = 0,
 	mDNIe_VIDEO_MODE,
@@ -62,6 +67,7 @@ enum ACCESSIBILITY {
 
 struct mdnie_lite_tun_type {
 	bool mdnie_enable;
+	enum BYPASS mdnie_bypass;
 	enum SCENARIO scenario;
 	enum BACKGROUND background;
 	enum OUTDOOR outdoor;
