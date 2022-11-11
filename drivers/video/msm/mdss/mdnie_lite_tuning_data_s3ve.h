@@ -208,6 +208,27 @@ static uint32_t EBOOK_AUTO_MDNIE[] = {
 	0xff, //cont
 };
 
+static uint32_t SCREEN_CURTAIN_MDNIE[] = {
+	MDP_PP_OPS_ENABLE, //pcc_en
+	0x00000000, //rc
+	0x00000000, //gc
+	0x00000000, //bc
+	0x00000000, //rr
+	0x00000000, //rg
+	0x00000000, //rb
+	0x00000000, //gr
+	0x00000000, //gg
+	0x00000000, //gb
+	0x00000000, //br
+	0x00000000, //bg
+	0x00000000, //bb
+	MDP_PP_OPS_DISABLE, //pa_en
+	0x00, //hue
+	0xff, //sat
+	0xff, //val
+	0xff, //cont
+};
+
 static uint32_t *blind_tunes[ACCESSIBILITY_MAX] = {
 /*
 	ACCESSIBILITY_OFF,
@@ -220,7 +241,7 @@ static uint32_t *blind_tunes[ACCESSIBILITY_MAX] = {
 	DEFAULT_MDNIE,
 	NEGATIVE_MDNIE,
 	DEFAULT_MDNIE,
-	DEFAULT_MDNIE,
+	SCREEN_CURTAIN_MDNIE,
 	GRAYSCALE_MDNIE,
 	GRAYSCALE_NEAGTIVE_MDNIE,
 };
