@@ -20,6 +20,8 @@
 #define _MDNIE_LITE_TUNING_S3VE_H_
 
 #define APP_ID_TDMB (20)
+#define MDNIE_NIGHT_MODE_CMD_SIZE 3
+#define MDNIE_NIGHT_MODE_MAX_INDEX 11
 
 enum BYPASS {
 	BYPASS_DISABLE = 0,
@@ -75,6 +77,8 @@ struct mdnie_lite_tun_type {
 	enum BACKGROUND background;
 	enum OUTDOOR outdoor;
 	enum ACCESSIBILITY accessibility;
+	int night_mode_enable;
+	int night_mode_index;
 };
 
 void init_mdnie_class(void);

@@ -41,6 +41,8 @@ struct mdnie_lite_tun_type mdnie_tun_state = {
 	.background = AUTO_MODE,
 	.outdoor = OUTDOOR_OFF_MODE,
 	.accessibility = ACCESSIBILITY_OFF,
+	.night_mode_enable = false,
+	.night_mode_index = 0,
 };
 
 const char scenario_name[MAX_mDNIe_MODE][16] = {
@@ -153,12 +155,14 @@ void mDNIe_Set_Mode(void)
 
 	/*
 	* mDnie priority
-	* Bypass > Accessibility > Screen Mode
+	* Bypass > Accessibility > Night Mode > Screen Mode
 	*/
 	if (mdnie_tun_state.mdnie_bypass == BYPASS_ENABLE)
 		memcpy(mdnie_cfg, DEFAULT_MDNIE, sizeof(mdnie_cfg));
 	else if (mdnie_tun_state.accessibility)
 		memcpy(mdnie_cfg, blind_tunes[mdnie_tun_state.accessibility], sizeof(mdnie_cfg));
+	else if (mdnie_tun_state.night_mode_enable == true)
+		memcpy(mdnie_cfg, NIGHT_MODE_MDNIE, sizeof(mdnie_cfg));
 	else
 		memcpy(mdnie_cfg,
 		       mdnie_tunes[mdnie_tun_state.scenario][mdnie_tun_state.background][mdnie_tun_state.outdoor],
@@ -166,12 +170,13 @@ void mDNIe_Set_Mode(void)
 
 	mdss_set_tuning(mdnie_cfg);
 
-	DPRINT("mDNIe_Set_Mode end , MDNIE_BYPASS(%d), %s(%d), %s(%d), %s(%d), %s(%d)\n",
+	DPRINT("mDNIe_Set_Mode end , MDNIE_BYPASS(%d), %s(%d), %s(%d), %s(%d), %s(%d), NIGHT_MODE_ENABLE(%d)\n",
 		mdnie_tun_state.mdnie_bypass,
 		scenario_name[mdnie_tun_state.scenario], mdnie_tun_state.scenario,
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
 		outdoor_name[mdnie_tun_state.outdoor], mdnie_tun_state.outdoor,
-		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility);
+		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility,
+		mdnie_tun_state.night_mode_enable);
 }
 
 void is_play_speed_1_5(int enable)
@@ -434,9 +439,47 @@ static ssize_t outdoor_store(struct device *dev,
 	return size;
 }
 
+static ssize_t night_mode_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	DPRINT("Current night mode : %s idx=%d\n",
+		mdnie_tun_state.night_mode_enable ? "ENABLE" : "DISABLE", mdnie_tun_state.night_mode_index);
+
+	return snprintf(buf, 256, "Current night mode : %s idx=%d\n",
+		mdnie_tun_state.night_mode_enable ? "ENABLE" : "DISABLE", mdnie_tun_state.night_mode_index);
+}
+
+static ssize_t night_mode_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t size)
+{
+	int enable, idx;
+	uint32_t *buffer;
+
+	sscanf(buf, "%d %d", &enable, &idx);
+
+	DPRINT("%s: enable = %d, idx = %d\n", __func__, enable, idx);
+
+	mdnie_tun_state.night_mode_enable = enable;
+	if (((idx >= 0) && (idx < MDNIE_NIGHT_MODE_MAX_INDEX)) && (enable == true)) {
+		if (!IS_ERR_OR_NULL(night_mode_data)) {
+			buffer = &night_mode_data[(MDNIE_NIGHT_MODE_CMD_SIZE * idx)];
+			if (!IS_ERR_OR_NULL(NIGHT_MODE_MDNIE)) {
+				NIGHT_MODE_MDNIE[4] = buffer[0];
+				NIGHT_MODE_MDNIE[8] = buffer[1];
+				NIGHT_MODE_MDNIE[12] = buffer[2];
+				mdnie_tun_state.night_mode_index = idx;
+			}
+		}
+	}
+
+	mDNIe_Set_Mode();
+	return size;
+}
+
 static DEVICE_ATTR(accessibility, 0664, accessibility_show, accessibility_store);
 static DEVICE_ATTR(bypass, 0664, bypass_show, bypass_store);
 static DEVICE_ATTR(mode, 0664, mode_show, mode_store);
+static DEVICE_ATTR(night_mode, 0664, night_mode_show, night_mode_store);
 static DEVICE_ATTR(outdoor, 0664, outdoor_show, outdoor_store);
 static DEVICE_ATTR(playspeed, 0664, playspeed_show, playspeed_store);
 static DEVICE_ATTR(scenario, 0664, scenario_show, scenario_store);
@@ -480,6 +523,12 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_mode) < 0)
 		pr_err("Failed to create device file(%s)!\n",
 			dev_attr_mode.attr.name);
+
+	/* NIGHT MODE */
+	if (device_create_file
+		(tune_mdnie_dev, &dev_attr_night_mode) < 0)
+		pr_err("Failed to create device file(%s)!\n",
+			dev_attr_night_mode.attr.name);
 
 	/* OUTDOOR */
 	if (device_create_file
