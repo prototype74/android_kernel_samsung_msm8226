@@ -1497,6 +1497,9 @@ static int ecryptfs_write_headers_virt(char *page_virt, size_t max,
 	size_t written;
 	size_t offset;
 
+#ifdef CONFIG_ECRYPTFS_FEK_INTEGRITY
+	crypt_stat->flags |= ECRYPTFS_ENABLE_HMAC;
+#endif
 	offset = ECRYPTFS_FILE_SIZE_BYTES;
 	write_ecryptfs_marker((page_virt + offset), &written);
 	offset += written;
@@ -1512,6 +1515,9 @@ static int ecryptfs_write_headers_virt(char *page_virt, size_t max,
 	if (rc)
 		ecryptfs_printk(KERN_WARNING, "Error generating key packet "
 				"set; rc = [%d]\n", rc);
+#ifdef CONFIG_ECRYPTFS_FEK_INTEGRITY
+	memcpy((page_virt + HASH_OFFSET), crypt_stat->hash, FEK_HASH_SIZE);
+#endif
 	if (size) {
 		offset += written;
 		*size = offset;
@@ -1754,6 +1760,11 @@ static int ecryptfs_read_headers_virt(char *page_virt,
 		offset += bytes_read;
 	} else
 		set_default_header_data(crypt_stat);
+#ifdef CONFIG_ECRYPTFS_FEK_INTEGRITY
+	if(crypt_stat->flags & ECRYPTFS_ENABLE_HMAC) {
+		memcpy(crypt_stat->hash, (page_virt + HASH_OFFSET), FEK_HASH_SIZE);
+	}
+#endif
 	rc = ecryptfs_parse_packet_set(crypt_stat, (page_virt + offset),
 				       ecryptfs_dentry);
 out:
