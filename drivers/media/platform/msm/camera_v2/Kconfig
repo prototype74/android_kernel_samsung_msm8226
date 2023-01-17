@@ -222,3 +222,9 @@ config MSMB_JPEG
 	  This module serves as the common driver
 	  for the JPEG 1.0 encoder and decoder.
 
+config CAMERA_ACTIVE_FLASH
+	bool "Rear Camera Active Flash Support"
+	  help
+	  Say yes here to enable support.
+	  If unsure, say N.
+

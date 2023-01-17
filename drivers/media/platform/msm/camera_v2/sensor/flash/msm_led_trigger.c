@@ -43,9 +43,23 @@ static int led_prev_mode = 0;
 extern struct class *camera_class; /*sys/class/camera*/
 static struct device *flash_dev;
 
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+static int lvl_backup = 0;
+#if defined(CONFIG_MACH_S3VE3G_EUR)
+// current_prgm value   = {1,   3,  3,  5,  5,   7,   7,   9,  10,  10};
+static int torchlevel[] = {25, 50, 50, 75, 75, 105, 105, 120, 145, 145};
+#else
+// current_prgm value   = {1,   2,  3,  5,  5,  6,   7,   8,   9,  10};
+static int torchlevel[] = {20, 35, 50, 65, 70, 85, 100, 115, 130, 145};
+#endif
+#endif
+
 static ssize_t qpnp_led_flash(struct device *dev,
 	 struct device_attribute *attr, const char *buf, size_t size)
 {
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+	int lvl = 0;
+#endif
 	int tmp;
 	uint32_t i;
 	sscanf(buf, "%i", &tmp);
@@ -91,15 +105,33 @@ static ssize_t qpnp_led_flash(struct device *dev,
 			led_trigger_event(fctrl.torch_trigger, 1000);
 		break;
 #endif
-
 	default:
-		fctrl.rear_flash_status=MSM_CAMERA_LED_OFF;
-		flash_widget_status=0;
-		for (i = 0; i < fctrl.num_sources; i++)
-			if (fctrl.flash_trigger[i])
-				led_trigger_event(fctrl.flash_trigger[i], 0);
-		if (fctrl.torch_trigger)
-			led_trigger_event(fctrl.torch_trigger, 0);
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+		if (tmp > 1000 && tmp <= 1010) {
+			lvl = torchlevel[tmp - 1001];
+			if (lvl_backup != lvl) {
+				for (i = 0; i < fctrl.num_sources; i++)
+					if (fctrl.flash_trigger[i])
+						led_trigger_event(fctrl.flash_trigger[i], 0);
+				if (fctrl.torch_trigger) {
+					led_trigger_event(fctrl.torch_trigger, 0);
+					led_trigger_event(fctrl.torch_trigger, lvl);
+				}
+				lvl_backup = lvl;
+			}
+		}
+		else {
+#endif
+			fctrl.rear_flash_status=MSM_CAMERA_LED_OFF;
+			flash_widget_status=0;
+			for (i = 0; i < fctrl.num_sources; i++)
+				if (fctrl.flash_trigger[i])
+					led_trigger_event(fctrl.flash_trigger[i], 0);
+			if (fctrl.torch_trigger)
+				led_trigger_event(fctrl.torch_trigger, 0);
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+		}
+#endif
 		break;
 	}
     return strnlen(buf, size);
@@ -248,6 +280,9 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 				led_trigger_event(fctrl->flash_trigger[i], 0);
 		if (fctrl->torch_trigger)
 			led_trigger_event(fctrl->torch_trigger, 0);
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+			lvl_backup = fctrl->torch_op_current;  // restore value
+#endif
 		break;
 
 	case MSM_CAMERA_LED_LOW:
@@ -272,6 +307,9 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 				led_trigger_event(fctrl->flash_trigger[i], 0);
 		if (fctrl->torch_trigger)
 			led_trigger_event(fctrl->torch_trigger, 0);
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+			lvl_backup = fctrl->torch_op_current;  // restore value
+#endif
 		break;
 
 	default:
@@ -388,7 +426,9 @@ static int32_t msm_led_trigger_probe(struct platform_device *pdev)
 				} else {
 					CDBG("torch max_current %d\n",
 						fctrl.torch_op_current);
-
+#if defined(CONFIG_CAMERA_ACTIVE_FLASH)
+					lvl_backup = fctrl.torch_op_current;  // init value
+#endif
 					led_trigger_register_simple(
 						fctrl.torch_trigger_name,
 						&fctrl.torch_trigger);
