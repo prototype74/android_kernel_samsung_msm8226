@@ -156,10 +156,21 @@ error:
 	return ret;
 }
 
+static ssize_t support_show(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+	char *support = "ALL";
+
+	pr_info("read support %s\n", support);
+	return snprintf(buf,  sizeof(support)+1, "%s\n", support);
+}
+
 static DEVICE_ATTR(disable, 0664, disable_show, disable_store);
+static DEVICE_ATTR(support, 0444, support_show, NULL);
 
 static struct attribute *usb_notify_attrs[] = {
 	&dev_attr_disable.attr,
+	&dev_attr_support.attr,
 	NULL,
 };
 
