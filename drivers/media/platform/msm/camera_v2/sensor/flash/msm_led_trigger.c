@@ -45,7 +45,7 @@ static struct device *flash_dev;
 
 #if defined(CONFIG_CAMERA_ACTIVE_FLASH)
 static int lvl_backup = 0;
-#if defined(CONFIG_MACH_S3VE3G_EUR)
+#if defined(CONFIG_MACH_S3VE3G_EUR) || defined(CONFIG_SEC_ATLANTIC_PROJECT)
 // current_prgm value   = {1,   3,  3,  5,  5,   7,   7,   9,  10,  10};
 static int torchlevel[] = {25, 50, 50, 75, 75, 105, 105, 120, 145, 145};
 #else
