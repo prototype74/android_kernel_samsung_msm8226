@@ -110,6 +110,11 @@
 #define MDNIE_COLOR_BLINDE_OFFSET 18
 #endif
 
+#if defined(CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+#define MDNIE_NIGHT_MODE_CMD_SIZE 24
+#define MDNIE_NIGHT_MODE_MAX_INDEX 11
+#endif
+
 #define BROWSER_COLOR_TONE_SET
 
 #define SIG_MDNIE_UI_MODE				0
@@ -239,6 +244,10 @@ struct mdnie_lite_tun_type {
 	int scr_white_red;
 	int scr_white_green;
 	int scr_white_blue;
+#endif
+#if defined(CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+	int night_mode_enable;
+	int night_mode_index;
 #endif
 };
 

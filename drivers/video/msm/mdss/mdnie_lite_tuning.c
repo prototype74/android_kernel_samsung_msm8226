@@ -158,6 +158,10 @@ struct mdnie_lite_tun_type mdnie_tun_state = {
 	.scr_white_green = 0xff,
 	.scr_white_blue = 0xff,
 #endif
+#if defined(CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+	.night_mode_enable = false,
+	.night_mode_index = 0,
+#endif
 };
 
 #if !defined(CONFIG_TDMB)
@@ -501,7 +505,12 @@ void mDNIe_Set_Mode(void)
 #endif
 
 	}
-
+#if defined(CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+	else if (mdnie_tun_state.night_mode_enable == true) {
+		INPUT_PAYLOAD1(NIGHT_MODE_MDNIE_1);
+		INPUT_PAYLOAD2(NIGHT_MODE_MDNIE_2);
+	}
+#endif
 #if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OCTA_CMD_WQHD_PT_PANEL) || defined (CONFIG_FB_MSM_MIPI_MAGNA_OCTA_CMD_HD_PT_PANEL) \
 	|| defined (CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
 	else if (mdnie_msd->dstat.auto_brightness >= 6 && mdnie_msd->dstat.bright_level == 255) {
@@ -592,11 +601,20 @@ void mDNIe_Set_Mode(void)
 	sending_tuning_cmd();
 	free_tun_cmd();
 
+#if defined (CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d), %s(%d), %s(%d), NIGHT_MODE_ENABLE(%d)\n",
+#else
 	DPRINT("mDNIe_Set_Mode end , %s(%d), %s(%d), %s(%d), %s(%d)\n",
+#endif
 		scenario_name[mdnie_tun_state.scenario], mdnie_tun_state.scenario,
 		background_name[mdnie_tun_state.background], mdnie_tun_state.background,
 		outdoor_name[mdnie_tun_state.outdoor], mdnie_tun_state.outdoor,
+#if defined (CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility,
+		mdnie_tun_state.night_mode_enable);
+#else
 		accessibility_name[mdnie_tun_state.accessibility], mdnie_tun_state.accessibility);
+#endif
 
 }
 
@@ -833,6 +851,45 @@ static ssize_t outdoor_store(struct device *dev,
 
 static DEVICE_ATTR(outdoor, 0664, outdoor_show, outdoor_store);
 
+#if defined(CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+static ssize_t night_mode_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	DPRINT("Current night mode : %s idx=%d\n",
+		mdnie_tun_state.night_mode_enable ? "ENABLE" : "DISABLE", mdnie_tun_state.night_mode_index);
+
+	return snprintf(buf, 256, "Current night mode : %s idx=%d\n",
+		mdnie_tun_state.night_mode_enable ? "ENABLE" : "DISABLE", mdnie_tun_state.night_mode_index);
+}
+
+static ssize_t night_mode_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t size)
+{
+	int enable, idx;
+	char *buffer;
+
+	sscanf(buf, "%d %d", &enable, &idx);
+
+	DPRINT("%s: enable = %d, idx = %d\n", __func__, enable, idx);
+
+	mdnie_tun_state.night_mode_enable = enable;
+	if (((idx >= 0) && (idx < MDNIE_NIGHT_MODE_MAX_INDEX)) && (enable == true)) {
+		if (!IS_ERR_OR_NULL(night_mode_data)) {
+			buffer = &night_mode_data[(MDNIE_NIGHT_MODE_CMD_SIZE * idx)];
+			if (!IS_ERR_OR_NULL(NIGHT_MODE_MDNIE_2)) {
+				memcpy(&NIGHT_MODE_MDNIE_2[MDNIE_COLOR_BLINDE_OFFSET],
+					buffer, MDNIE_NIGHT_MODE_CMD_SIZE);
+				mdnie_tun_state.night_mode_index = idx;
+			}
+		}
+	}
+
+	mDNIe_Set_Mode();
+	return size;
+}
+
+static DEVICE_ATTR(night_mode, 0664, night_mode_show, night_mode_store);
+#endif
 
 #if defined(AUTO_BRIGHTNESS_CABC_FUNCTION)
 
@@ -1354,6 +1411,14 @@ void init_mdnie_class(void)
 		(tune_mdnie_dev, &dev_attr_outdoor) < 0)
 		pr_err("Failed to create device file(%s)!\n",
 	       dev_attr_outdoor.attr.name);
+
+#if defined(CONFIG_FB_MSM_MDSS_MAGNA_OCTA_VIDEO_720P_PANEL)
+	/* NIGHT MODE */
+	if (device_create_file
+		(tune_mdnie_dev, &dev_attr_night_mode) < 0)
+		pr_err("Failed to create device file(%s)!\n",
+			dev_attr_night_mode.attr.name);
+#endif
 
 #if defined(AUTO_BRIGHTNESS_CABC_FUNCTION)
 	if (device_create_file
