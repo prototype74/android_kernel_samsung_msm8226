@@ -1111,9 +1111,8 @@ static int binder_inc_node(struct binder_node *node, int strong, int internal,
 			      node == node->proc->context->
 				      binder_context_mgr_node &&
 			      node->has_strong_ref)) {
-				binder_debug(BINDER_DEBUG_TOP_ERRORS,
-					     "invalid inc strong node for %d\n",
-					     node->debug_id);
+				pr_err("invalid inc strong node for %d\n",
+					node->debug_id);
 				return -EINVAL;
 			}
 			node->internal_strong_refs++;
@@ -1594,9 +1593,8 @@ static void binder_transaction_buffer_release(struct binder_proc *proc,
 		size_t object_size = binder_validate_object(buffer, *offp);
 
 		if (object_size == 0) {
-			binder_debug(BINDER_DEBUG_TOP_ERRORS,
-				     "transaction release %d bad object at offset %lld, size %zd\n",
-				     debug_id, (u64)*offp, buffer->data_size);
+			pr_err("transaction release %d bad object at offset %lld, size %zd\n",
+			       debug_id, (u64)*offp, buffer->data_size);
 			continue;
 		}
 		hdr = (struct binder_object_header *)(buffer->data + *offp);
@@ -1695,9 +1693,8 @@ static void binder_transaction_buffer_release(struct binder_proc *proc,
 				task_close_fd(proc, fd_array[fd_index]);
 		} break;
 		default:
-			binder_debug(BINDER_DEBUG_TOP_ERRORS,
-				     "transaction release %d bad object type %x\n",
-				     debug_id, hdr->type);
+			pr_err("transaction release %d bad object type %x\n",
+				debug_id, hdr->type);
 			break;
 		}
 	}
@@ -3352,8 +3349,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		break;
 	case BINDER_SET_CONTEXT_MGR:
 		if (context->binder_context_mgr_node) {
-			binder_debug(BINDER_DEBUG_TOP_ERRORS,
-				     "BINDER_SET_CONTEXT_MGR already set\n");
+			pr_err("BINDER_SET_CONTEXT_MGR already set\n");
 			ret = -EBUSY;
 			goto err;
 		}
@@ -3362,10 +3358,9 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			goto err;
 		if (context->binder_context_mgr_uid != -1) {
 			if (context->binder_context_mgr_uid != current->cred->euid) {
-				binder_debug(BINDER_DEBUG_TOP_ERRORS,
-					     "BINDER_SET_CONTEXT_MGR bad uid %d != %d\n",
-					     current->cred->euid,
-					     context->binder_context_mgr_uid);
+				pr_err("BINDER_SET_CONTEXT_MGR bad uid %d != %d\n",
+				       current->cred->euid,
+				       context->binder_context_mgr_uid);
 				ret = -EPERM;
 				goto err;
 			}
