@@ -463,14 +463,14 @@ static void packagelist_destroy(void)
 	pr_info("sdcardfs: destroyed packagelist pkgld\n");
 }
 
-struct package_appid {
+struct package_details {
 	struct config_item item;
 	struct qstr name;
 };
 
-static inline struct package_appid *to_package_appid(struct config_item *item)
+static inline struct package_details *to_package_details(struct config_item *item)
 {
-	return item ? container_of(item, struct package_appid, item) : NULL;
+	return item ? container_of(item, struct package_details, item) : NULL;
 }
 
 CONFIGFS_ATTR_STRUCT(package_details);
@@ -478,18 +478,15 @@ CONFIGFS_ATTR_STRUCT(package_details);
 struct package_details_attribute package_details_attr_##_name = __CONFIGFS_ATTR(_name, _mode, _show, _store)
 #define PACKAGE_DETAILS_ATTRIBUTE(name) (&package_details_attr_##name.attr)
 
-static ssize_t package_appid_attr_show(struct config_item *item,
-				      struct configfs_attribute *attr,
+static ssize_t package_details_appid_show(struct package_details *package_details,
 				      char *page)
 {
 	return scnprintf(page, PAGE_SIZE, "%u\n", __get_appid(&package_details->name));
 }
 
-static ssize_t package_appid_attr_store(struct config_item *item,
-				       struct configfs_attribute *attr,
+static ssize_t package_details_appid_store(struct package_details *package_details,
 				       const char *page, size_t count)
 {
-	struct package_appid *package_appid = to_package_appid(item);
 	unsigned int tmp;
 	int ret;
 
@@ -587,8 +584,8 @@ static struct configfs_item_operations package_details_item_ops = {
 };
 
 static struct config_item_type package_appid_type = {
-	.ct_item_ops	= &package_appid_item_ops,
-	.ct_attrs	= package_appid_attrs,
+	.ct_item_ops	= &package_details_item_ops,
+	.ct_attrs	= package_details_attrs,
 	.ct_owner	= THIS_MODULE,
 };
 
@@ -720,9 +717,9 @@ struct packages {
 	struct configfs_subsystem subsystem;
 };
 
-static inline struct sdcardfs_packages *to_sdcardfs_packages(struct config_item *item)
+static inline struct packages *to_packages(struct config_item *item)
 {
-	return item ? container_of(to_config_group(item), struct sdcardfs_packages, group) : NULL;
+	return item ? container_of(to_configfs_subsystem(to_config_group(item)), struct packages, subsystem) : NULL;
 }
 
 CONFIGFS_ATTR_STRUCT(packages);
@@ -747,24 +744,11 @@ static struct config_item *packages_make_item(struct config_group *group, const 
 	qstr_init(&package_details->name, tmp);
 	config_item_init_type_name(&package_details->item, name,
 						&package_appid_type);
-	package_appid->add_pid = 0;
 
-	return &package_appid->item;
+	return &package_details->item;
 }
 
-static struct configfs_attribute sdcardfs_packages_attr_description = {
-	.ca_owner = THIS_MODULE,
-	.ca_name = "packages_gid.list",
-	.ca_mode = S_IRUGO,
-};
-
-static struct configfs_attribute *sdcardfs_packages_attrs[] = {
-	&sdcardfs_packages_attr_description,
-	NULL,
-};
-
-static ssize_t packages_attr_show(struct config_item *item,
-					 struct configfs_attribute *attr,
+static ssize_t packages_list_show(struct packages *packages,
 					 char *page)
 {
 	struct hashtable_entry *hash_cur_app;
@@ -819,23 +803,24 @@ static struct configfs_attribute *packages_attrs[] = {
 	NULL,
 };
 
-static struct configfs_item_operations sdcardfs_packages_item_ops = {
-	.release	= sdcardfs_packages_release,
-	.show_attribute	= packages_attr_show,
+CONFIGFS_ATTR_OPS(packages)
+static struct configfs_item_operations packages_item_ops = {
+	.show_attribute = packages_attr_show,
+	.store_attribute = packages_attr_store,
 };
 
 /*
  * Note that, since no extra work is required on ->drop_item(),
  * no ->drop_item() is provided.
  */
-static struct configfs_group_operations sdcardfs_packages_group_ops = {
-	.make_item	= sdcardfs_packages_make_item,
+static struct configfs_group_operations packages_group_ops = {
+	.make_item	= packages_make_item,
 };
 
-static struct config_item_type sdcardfs_packages_type = {
-	.ct_item_ops	= &sdcardfs_packages_item_ops,
-	.ct_group_ops	= &sdcardfs_packages_group_ops,
-	.ct_attrs	= sdcardfs_packages_attrs,
+static struct config_item_type packages_type = {
+	.ct_item_ops	= &packages_item_ops,
+	.ct_group_ops	= &packages_group_ops,
+	.ct_attrs	= packages_attrs,
 	.ct_owner	= THIS_MODULE,
 };
 
@@ -876,7 +861,7 @@ static int configfs_sdcardfs_init(void)
 
 static void configfs_sdcardfs_exit(void)
 {
-	configfs_unregister_subsystem(&sdcardfs_packages_subsys);
+	configfs_unregister_subsystem(&sdcardfs_packages.subsystem);
 }
 
 int packagelist_init(void)
