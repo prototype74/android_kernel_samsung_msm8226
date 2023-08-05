@@ -49,6 +49,12 @@ config W1_SN
 	help
 	  This allows to check the SN.
 
+config W1_FORCE_SAMSUNG_FLIPCOVER
+	bool "Force use samsung flip cover"
+	default n
+	help
+	  This forces the check_id always to return 0.
+
 source drivers/w1/masters/Kconfig
 source drivers/w1/slaves/Kconfig
 

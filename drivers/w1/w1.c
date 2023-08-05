@@ -578,8 +578,14 @@ static ssize_t w1_master_attribute_show_cf(struct device *dev, struct device_att
 
 static ssize_t w1_master_attribute_show_check_id(struct device *dev, struct device_attribute *attr, char *buf)
 {
+#ifdef CONFIG_W1_FORCE_SAMSUNG_FLIPCOVER
+	int flip_cover = 0;
+	printk("Inside w1_master_attribute_show_check_id id  = %d (force flip cover)\n", flip_cover);
+	return sprintf(buf, "%d\n", flip_cover);
+#else
 	printk("Inside w1_master_attribute_show_check_id id  = %d \n",id);
 	return sprintf(buf, "%d\n", id);
+#endif
 }
 
 static ssize_t w1_master_attribute_show_check_color(struct device *dev, struct device_attribute *attr, char *buf)
